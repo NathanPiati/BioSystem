@@ -1,0 +1,25 @@
+{% extends 'base_portal.html' %}
+
+{% block content %}
+<div style="max-width:560px;">
+    <h2 style="margin-bottom:0.25rem;">{{ title }}</h2>
+    <p style="color:#6b7280; margin-bottom:1.5rem; font-size:0.9rem;">
+        {% if object %}Atualize os dados do exercício.{% else %}Preencha os dados para adicionar à biblioteca.{% endif %}
+    </p>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-row">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.errors %}<small style="color:#dc2626;">{{ field.errors|join:', ' }}</small>{% endif %}
+            </div>
+        {% endfor %}
+        <div class="button-group">
+            <button type="submit">Salvar</button>
+            <a class="button-link" href="{% url 'exercise_list' %}" style="background: linear-gradient(135deg, #718096 0%, #4a5568 100%); box-shadow: 0 4px 12px rgba(113,128,150,0.3);">Voltar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

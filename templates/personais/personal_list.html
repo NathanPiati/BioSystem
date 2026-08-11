@@ -1,0 +1,45 @@
+{% extends 'base_portal.html' %}
+
+{% block content %}
+    <h2>Personais</h2>
+    <p>Cadastro e gerenciamento dos profissionais.</p>
+
+    <div class="button-group">
+        <a class="button-link" href="{% url 'personal_create' %}">Novo personal</a>
+    </div>
+
+    <div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th>Telefone</th>
+                <th>CREF</th>
+                <th>Status</th>
+                <th>Acoes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for personal in personals %}
+                <tr>
+                    <td>{{ personal.first_name }} {{ personal.last_name }}</td>
+                    <td>{{ personal.email }}</td>
+                    <td>{{ personal.phone|default:'-' }}</td>
+                    <td>{{ personal.cref|default:'-' }}</td>
+                    <td>{% if personal.is_active %}Ativo{% else %}Inativo{% endif %}</td>
+                    <td class="table-actions">
+                        <a href="{% url 'personal_detail' personal.pk %}">Ver</a>
+                        <a href="{% url 'personal_edit' personal.pk %}">Editar</a>
+                        <a href="{% url 'personal_delete' personal.pk %}" style="color:#ef4444;">Excluir</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6">Nenhum personal cadastrado.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+{% endblock %}

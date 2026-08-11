@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>{% if object %}Editar aluno{% else %}Cadastrar aluno{% endif %}</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-row">
+            <label for="id_first_name">Nome</label>
+            {{ form.first_name }}
+        </div>
+        <div class="form-row">
+            <label for="id_last_name">Sobrenome</label>
+            {{ form.last_name }}
+        </div>
+        <div class="form-row">
+            <label for="id_email">E-mail</label>
+            {{ form.email }}
+        </div>
+        <div class="form-row">
+            <label for="id_phone">Telefone</label>
+            {{ form.phone }}
+        </div>
+        <div class="form-row">
+            <label for="id_card_id">ID do Cartão</label>
+            {{ form.card_id }}
+            <small class="form-text text-muted">Código do cartão RFID ou código de barras para acesso à catraca</small>
+        </div>
+
+        <h3>Biometria</h3>
+        <div class="form-row">
+            <label for="id_biometric_enabled">
+                {{ form.biometric_enabled }}
+                Ativar autenticação biométrica
+            </label>
+        </div>
+        <div class="form-row">
+            <label for="id_face_photo">Foto Facial</label>
+            {{ form.face_photo }}
+            <small class="form-text text-muted">Foto para reconhecimento facial (opcional)</small>
+            {% if form.instance.face_photo %}
+            <div class="mt-2">
+                <img src="{{ form.instance.face_photo.url }}" alt="Foto atual" style="max-width: 200px; max-height: 200px;">
+            </div>
+            {% endif %}
+        </div>
+
+        <h3>Endereço</h3>
+        <div class="form-row">
+            <label for="id_zip_code">CEP</label>
+            {{ form.zip_code }}
+            
+        </div>
+        <div class="button-group">
+            <button type="button" id="search-zip" class="button-link" style="margin-left: 10px;">Buscar CEP</button>
+        </div><br>
+        <div class="form-row">
+            <label for="id_street">Rua</label>
+            {{ form.street }}
+        </div>
+        <div class="form-row">
+            <label for="id_number">Número</label>
+            {{ form.number }}
+        </div>
+        <div class="form-row">
+            <label for="id_complement">Complemento</label>
+            {{ form.complement }}
+        </div>
+        <div class="form-row">
+            <label for="id_neighborhood">Bairro</label>
+            {{ form.neighborhood }}
+        </div>
+        <div class="form-row">
+            <label for="id_city">Cidade</label>
+            {{ form.city }}
+        </div>
+        <div class="form-row">
+            <label for="id_state">Estado</label>
+            {{ form.state }}
+        </div>
+
+        <div class="button-group">
+            <button type="submit">Salvar</button>
+            <a class="button-link" href="{% url 'member_list' %}">Cancelar</a>
+        </div>
+    </form>
+
+    <script>
+        document.getElementById('search-zip').addEventListener('click', function() {
+            const zipCode = document.getElementById('id_zip_code').value.replace(/\D/g, '');
+
+            if (zipCode.length !== 8) {
+                alert('Digite um CEP válido com 8 dígitos');
+                return;
+            }
+
+            this.textContent = 'Buscando...';
+            this.disabled = true;
+
+            fetch(`/api/search-zip-code/?zip_code=${zipCode}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        document.getElementById('id_street').value = data.street || '';
+                        document.getElementById('id_neighborhood').value = data.neighborhood || '';
+                        document.getElementById('id_city').value = data.city || '';
+                        document.getElementById('id_state').value = data.state || '';
+                        document.getElementById('id_number').focus();
+                    }
+                })
+                .catch(error => {
+                    alert('Erro ao buscar CEP. Tente novamente.');
+                    console.error('Erro:', error);
+                })
+                .finally(() => {
+                    this.textContent = 'Buscar CEP';
+                    this.disabled = false;
+                });
+        });
+
+        // Máscara para CEP
+        document.getElementById('id_zip_code').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 5) {
+                value = value.slice(0, 5) + '-' + value.slice(5, 8);
+            }
+            e.target.value = value;
+        });
+    </script>
+{% endblock %}

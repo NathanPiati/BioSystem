@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Mapa de Alunos</h2>
+    <p>Visualize a localização dos alunos com endereço cadastrado. Se um endereço não estiver completo, ele não será geocodificado.</p>
+    <div class="button-group">
+        <a class="button-link" href="{% url 'member_list' %}">Voltar à lista</a>
+    </div>
+    <div id="map" class="map-container" style="height: 560px; margin-top: 1.5rem; border-radius: 12px;"></div>
+    <div id="map-status" style="margin-top: 1rem; color: #333; line-height: 1.5;"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-o9N1j7kqYsQv6T2JnpT2IDJ7KzvtszXAK+3m8aBP4RM=" crossorigin=""></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-sA+e2/HfN2pXcKp7wzG/OvidBQJQ8sAHTM9G+9om128=" crossorigin=""/>
+
+    {{ members|json_script:"member-data" }}
+    <script>
+        const members = JSON.parse(document.getElementById('member-data').textContent || '[]');
+        const statusEl = document.getElementById('map-status');
+        const map = L.map('map').setView([-14.2350, -51.9253], 4);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 18,
+        }).addTo(map);
+
+        const markerGroup = L.featureGroup().addTo(map);
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function geocodeAddress(address) {
+            const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(address)}`;
+            const response = await fetch(url, {
+                headers: {
+                    'Accept-Language': 'pt-BR',
+                    'Referer': window.location.origin,
+                }
+            });
+            if (!response.ok) {
+                throw new Error('Falha na geocodificação');
+            }
+            const results = await response.json();
+            return results.length ? results[0] : null;
+        }
+
+        async function renderMap() {
+            if (!members.length) {
+                statusEl.textContent = 'Nenhum aluno com endereço disponível para exibir no mapa.';
+                return;
+            }
+
+            statusEl.textContent = 'Carregando localizações... aguarde.';
+            let added = 0;
+            const bounds = [];
+
+            for (const member of members) {
+                if (!member.address || member.address === 'Endereço não informado') {
+                    continue;
+                }
+
+                try {
+                    const result = await geocodeAddress(member.address);
+                    if (result) {
+                        const lat = parseFloat(result.lat);
+                        const lon = parseFloat(result.lon);
+                        const marker = L.marker([lat, lon]);
+                        marker.bindPopup(`<strong>${member.name}</strong><br>${member.address}`);
+                        marker.addTo(markerGroup);
+                        bounds.push([lat, lon]);
+                        added += 1;
+                    }
+                } catch (error) {
+                    console.error('Erro geocodificando', member, error);
+                }
+
+                await sleep(800);
+            }
+
+            if (bounds.length) {
+                map.fitBounds(bounds, { padding: [40, 40] });
+                statusEl.textContent = `Exibindo ${added} aluno(s) no mapa.`;
+            } else {
+                statusEl.textContent = 'Não foi possível geocodificar nenhum endereço. Verifique se os dados de endereço estão completos.';
+            }
+        }
+
+        renderMap();
+    </script>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'base_portal.html' %}
+
+{% block content %}
+<div style="max-width: 520px; margin: 0 auto; text-align: center; padding: 2rem 0;">
+    <div style="font-size: 3.5rem; margin-bottom: 1rem;">⚠️</div>
+    <h2 style="margin-bottom: 0.5rem;">Excluir personal</h2>
+    <p style="color: #718096; margin-bottom: 1.5rem;">
+        Tem certeza que deseja excluir o personal <strong>"{{ object }}"</strong>?
+        <br><small style="color:#ef4444;">Todos os clientes e treinos vinculados tambem serao excluidos.</small>
+    </p>
+    <form method="post" style="display:flex; justify-content:center; gap:1rem; flex-wrap:wrap;">
+        {% csrf_token %}
+        <button type="submit" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); box-shadow: 0 4px 15px rgba(239,68,68,0.4);">Sim, excluir</button>
+        <a class="button-link" href="{% url 'personal_detail' object.pk %}" style="background: linear-gradient(135deg, #718096 0%, #4a5568 100%); box-shadow: 0 4px 15px rgba(113,128,150,0.3);">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

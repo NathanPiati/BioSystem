@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Matrículas</h2>
+    <div class="button-group">
+        <a class="button-link" href="{% url 'enrollment_create' %}">Nova matrícula</a>
+    </div>
+    <div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Aluno</th>
+                <th>Plano</th>
+                <th>Início</th>
+                <th>Fim</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for enrollment in enrollments %}
+                <tr>
+                    <td>{{ enrollment.id }}</td>
+                    <td>{{ enrollment.member }}</td>
+                    <td>{{ enrollment.plan }}</td>
+                    <td>{{ enrollment.start_date }}</td>
+                    <td>{{ enrollment.end_date }}</td>
+                    <td><a class="button-link" href="{% url 'enrollment_edit' enrollment.pk %}">Editar</a></td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5">Nenhuma matrícula registrada ainda.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'base_portal.html' %}
+
+{% block content %}
+    <h2>Clientes dos personais</h2>
+    <p>Area separada da academia para gerenciar clientes e enviar para academia quando necessario.</p>
+
+    <form method="get" style="margin-top: 1rem;">
+        <div class="form-row">
+            <label for="personal">Filtrar por personal</label>
+            <select name="personal" id="personal">
+                <option value="">Todos</option>
+                {% for personal in personals %}
+                    <option value="{{ personal.id }}" {% if request.GET.personal == personal.id|stringformat:'s' %}selected{% endif %}>
+                        {{ personal.first_name }} {{ personal.last_name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="button-group">
+            <button type="submit">Filtrar</button>
+            <a class="button-link" href="{% url 'personal_client_create' %}">Novo cliente</a>
+        </div>
+    </form>
+
+    <div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Personal</th>
+                <th>Contato</th>
+                <th>Objetivo</th>
+                <th>Na academia</th>
+                <th>Acoes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for client in clients %}
+                <tr>
+                    <td>{{ client.first_name }} {{ client.last_name }}</td>
+                    <td>{{ client.personal.first_name }} {{ client.personal.last_name }}</td>
+                    <td>{{ client.phone|default:'-' }}</td>
+                    <td>{{ client.goal|default:'-' }}</td>
+                    <td>{% if client.academy_member %}Sim{% else %}Nao{% endif %}</td>
+                    <td class="table-actions">
+                        <a href="{% url 'personal_client_detail' client.pk %}">Ver</a>
+                        <a href="{% url 'personal_client_edit' client.pk %}">Editar</a>
+                        {% if not client.academy_member %}
+                            <a href="{% url 'move_client_to_academy' client.pk %}">Academia</a>
+                        {% endif %}
+                        <a href="{% url 'personal_client_delete' client.pk %}" style="color:#ef4444;">Excluir</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6">Nenhum cliente cadastrado.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+{% endblock %}

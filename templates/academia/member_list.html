@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Alunos</h2>
+    <div class="button-group">
+        <a class="button-link" href="{% url 'member_create' %}">Cadastrar aluno</a>
+        <a class="button-link" href="{% url 'member_map' %}">Ver no mapa</a>
+    </div>
+    <div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th>Telefone</th>
+                <th>Endereço</th>
+                <th>Entrada</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for member in members %}
+                <tr>
+                    <td>{{ member.id }}</td>
+                    <td>{{ member.first_name }} {{ member.last_name }}</td>
+                    <td>{{ member.email }}</td>
+                    <td>{{ member.phone }}</td>
+                    <td>{{ member.full_address }}</td>
+                    <td>{{ member.joined_at }}</td>
+                    <td><a class="button-link" href="{% url 'member_edit' member.pk %}">Editar</a></td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6">Nenhum aluno cadastrado ainda.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Planos</h2>
+    <div class="button-group">
+        <a class="button-link" href="{% url 'plan_create' %}">Novo plano</a>
+    </div>
+    <div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Plano</th>
+                <th>Preço</th>
+                <th>Duração (dias)</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for plan in plans %}
+                <tr>
+                    <td>{{ plan.id }}</td>
+                    <td>{{ plan.name }}</td>
+                    <td>R$ {{ plan.price }}</td>
+                    <td>{{ plan.duration_days }}</td>
+                    <td><a class="button-link" href="{% url 'plan_edit' plan.pk %}">Editar</a></td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">Nenhum plano cadastrado ainda.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+{% endblock %}

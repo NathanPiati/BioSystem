@@ -1,0 +1,88 @@
+{% extends 'base_portal.html' %}
+
+{% block content %}
+<style>
+    .exercise-card { border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.25rem; margin-bottom: 0.75rem; display: grid; grid-template-columns: 2.5rem 1fr repeat(4, auto); gap: 1rem; align-items: center; background: #fafafa; transition: box-shadow 0.2s; }
+    .exercise-card:hover { box-shadow: 0 4px 12px rgba(102,126,234,0.12); }
+    .exercise-order { width: 2rem; height: 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; }
+    .exercise-name { font-weight: 600; color: #1a202c; }
+    .exercise-stat { text-align: center; }
+    .exercise-stat span { display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: #a0aec0; }
+    .exercise-stat strong { font-size: 0.95rem; color: #2d3748; }
+    .notes-box { background: #fffbeb; border-left: 3px solid #f59e0b; border-radius: 8px; padding: 1rem 1.25rem; margin-top: 1.5rem; }
+    .btn-danger { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 0.7rem 1.4rem; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(239,68,68,0.3); transition: all 0.3s; display: inline-block; }
+    .btn-danger:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(239,68,68,0.45); }
+</style>
+
+<div class="detail-header">
+    <div>
+        <h2>{{ workout.name }}</h2>
+        <p style="color:#718096; margin-top:0.25rem;">
+            Cliente: <strong>{{ workout.client }}</strong> &mdash; Personal: <strong>{{ workout.personal }}</strong>
+        </p>
+    </div>
+    <div class="action-links">
+        <a class="button-link" href="{% url 'workout_print' workout.pk %}" target="_blank">Imprimir</a>
+        <a class="button-link" href="{% url 'workout_edit' workout.pk %}">Editar treino</a>
+        <a class="btn-danger" href="{% url 'workout_delete' workout.pk %}">Excluir</a>
+    </div>
+</div>
+
+<div class="detail-meta">
+    <div class="meta-item">
+        <span>Objetivo</span>
+        <strong>{{ workout.goal|default:'—' }}</strong>
+    </div>
+    <div class="meta-item">
+        <span>Exercicios</span>
+        <strong>{{ workout.exercises.count }}</strong>
+    </div>
+    <div class="meta-item">
+        <span>Criado em</span>
+        <strong>{{ workout.created_at|date:'d/m/Y' }}</strong>
+    </div>
+    <div class="meta-item">
+        <span>Atualizado em</span>
+        <strong>{{ workout.updated_at|date:'d/m/Y H:i' }}</strong>
+    </div>
+</div>
+
+<h3 style="margin-bottom:1rem;">Exercicios</h3>
+
+{% for exercise in workout.exercises.all %}
+    <div class="exercise-card">
+        <div class="exercise-order">{{ exercise.order }}</div>
+        <div class="exercise-name">{{ exercise.name }}</div>
+        <div class="exercise-stat">
+            <span>Series</span>
+            <strong>{{ exercise.sets }}</strong>
+        </div>
+        <div class="exercise-stat">
+            <span>Reps</span>
+            <strong>{{ exercise.reps }}</strong>
+        </div>
+        <div class="exercise-stat">
+            <span>Carga</span>
+            <strong>{{ exercise.load|default:'—' }}</strong>
+        </div>
+        <div class="exercise-stat">
+            <span>Descanso</span>
+            <strong>{{ exercise.rest_seconds }}s</strong>
+        </div>
+    </div>
+{% empty %}
+    <p style="color:#a0aec0;">Nenhum exercicio cadastrado neste treino.</p>
+{% endfor %}
+
+{% if workout.notes %}
+    <div class="notes-box">
+        <strong>Observacoes:</strong>
+        <p style="margin-top:0.5rem;">{{ workout.notes }}</p>
+    </div>
+{% endif %}
+
+<div class="button-group" style="margin-top:2rem;">
+    <a class="button-link" href="{% url 'personal_client_detail' workout.client.pk %}">Ver cliente</a>
+    <a class="button-link" href="{% url 'workout_list' %}">Voltar aos treinos</a>
+</div>
+{% endblock %}

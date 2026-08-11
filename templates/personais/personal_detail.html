@@ -1,0 +1,92 @@
+{% extends 'base_portal.html' %}
+
+{% block content %}
+<style>
+    .detail-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; }
+    .detail-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .meta-item { background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%); border-left: 3px solid #667eea; border-radius: 8px; padding: 1rem 1.25rem; }
+    .meta-item span { display: block; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: #718096; margin-bottom: 0.25rem; }
+    .meta-item strong { font-size: 1rem; color: #1a202c; }
+    .client-card { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 0.6rem; background: #fafafa; transition: box-shadow 0.2s; }
+    .client-card:hover { box-shadow: 0 4px 12px rgba(102,126,234,0.1); }
+    .client-info strong { display: block; color: #1a202c; }
+    .client-info small { color: #718096; font-size: 0.82rem; }
+    .client-actions a { margin-left: 0.75rem; color: #667eea; font-weight: 600; font-size: 0.9rem; text-decoration: none; }
+    .status-badge { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600; }
+    .status-active { background: #f0fdf4; color: #10b981; }
+    .status-inactive { background: #fef2f2; color: #ef4444; }
+    .action-links a { margin-right: 0.75rem; }
+    .btn-danger { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 0.7rem 1.4rem; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(239,68,68,0.3); transition: all 0.3s; }
+    .btn-danger:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(239,68,68,0.45); }
+    .section-title { font-size: 1.1rem; font-weight: 700; color: #2d3748; margin: 1.5rem 0 0.75rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+</style>
+
+<div class="detail-header">
+    <div>
+        <h2>{{ personal.first_name }} {{ personal.last_name }}</h2>
+        <p style="color:#718096; margin-top:0.25rem;">
+            {% if personal.cref %}CREF: <strong>{{ personal.cref }}</strong> &mdash; {% endif %}
+            <span class="status-badge {% if personal.is_active %}status-active{% else %}status-inactive{% endif %}">
+                {% if personal.is_active %}Ativo{% else %}Inativo{% endif %}
+            </span>
+        </p>
+    </div>
+    <div class="action-links">
+        <a class="button-link" href="{% url 'personal_edit' personal.pk %}">Editar</a>
+        <a class="btn-danger" href="{% url 'personal_delete' personal.pk %}">Excluir</a>
+    </div>
+</div>
+
+<div class="detail-meta">
+    <div class="meta-item">
+        <span>E-mail</span>
+        <strong>{{ personal.email }}</strong>
+    </div>
+    <div class="meta-item">
+        <span>Telefone</span>
+        <strong>{{ personal.phone|default:'—' }}</strong>
+    </div>
+    <div class="meta-item">
+        <span>Clientes ativos</span>
+        <strong>{{ clients.count }}</strong>
+    </div>
+    <div class="meta-item">
+        <span>Total de treinos</span>
+        <strong>{{ total_workouts }}</strong>
+    </div>
+    <div class="meta-item">
+        <span>Cadastrado em</span>
+        <strong>{{ personal.created_at|date:'d/m/Y' }}</strong>
+    </div>
+</div>
+
+<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+    <p class="section-title" style="margin:0;">Clientes</p>
+    <a class="button-link" href="{% url 'personal_client_create' %}" style="padding:0.6rem 1.2rem; font-size:0.88rem;">+ Novo cliente</a>
+</div>
+
+<div style="margin-top:0.75rem;">
+    {% for client in clients %}
+        <div class="client-card">
+            <div class="client-info">
+                <strong>{{ client.first_name }} {{ client.last_name }}</strong>
+                <small>
+                    {{ client.workouts.count }} treino{{ client.workouts.count|pluralize }}
+                    {% if client.goal %} &mdash; {{ client.goal }}{% endif %}
+                    {% if client.academy_member %} &mdash; <span style="color:#10b981;">Na academia</span>{% endif %}
+                </small>
+            </div>
+            <div class="client-actions">
+                <a href="{% url 'personal_client_detail' client.pk %}">Ver perfil</a>
+                <a href="{% url 'workout_create' %}">+ Treino</a>
+            </div>
+        </div>
+    {% empty %}
+        <p style="color:#a0aec0; padding:1rem 0;">Nenhum cliente cadastrado. <a href="{% url 'personal_client_create' %}" style="color:#667eea;">Cadastrar cliente</a></p>
+    {% endfor %}
+</div>
+
+<div class="button-group" style="margin-top:2rem;">
+    <a class="button-link" href="{% url 'personal_list' %}">Voltar aos personais</a>
+</div>
+{% endblock %}

@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <style>
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .chart-container {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+            height: 350px; /* Altura fixa para estabilidade */
+            position: relative; /* Importante para o Chart.js */
+            overflow: hidden;
+        }
+        .chart-container h4 {
+            margin-bottom: 1rem;
+            color: #4a5568;
+            text-align: center;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-top: 4px solid #667eea;
+            text-align: center;
+        }
+        .stat-card span {
+            display: block;
+            font-size: 0.85rem;
+            color: #718096;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .stat-card strong {
+            font-size: 1.75rem;
+            color: #2d3748;
+        }
+    </style>
+
+    <h2>{{ title }}</h2>
+    <p>{{ description }}</p>
+
+    {% if not request.user.is_authenticated %}
+        <div style="margin-top: 2rem; text-align: center; padding: 3rem; background: #f7fafc; border-radius: 12px;">
+            <p style="font-size: 1.2rem; color: #4a5568; margin-bottom: 1.5rem;">Por favor, faça login para acessar as funcionalidades da academia.</p>
+            <a href="{% url 'login' %}" class="button-link">Clique aqui para entrar</a>
+        </div>
+    {% else %}
+        <section style="margin-top: 2rem;">
+            <h3>📊 Dashboard Executivo</h3>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span>Alunos</span>
+                    <strong>{{ member_count }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span>Matrículas</span>
+                    <strong>{{ enrollment_count }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span>Personais</span>
+                    <strong>{{ personal_count }}</strong>
+                </div>
+                <div class="stat-card">
+                    <span>Treinos</span>
+                    <strong>{{ workout_count }}</strong>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="chart-container">
+                    <h4>Alunos por Plano</h4>
+                    <canvas id="plansChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h4>Acessos (Últimos 7 dias)</h4>
+                    <canvas id="accessChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h4>Clientes por Personal</h4>
+                    <canvas id="personalsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h4>Ações Rápidas</h4>
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;">
+                        <a href="{% url 'member_list' %}" class="nav-link" style="background: #edf2f7;">👥 Gerenciar Alunos</a>
+                        <a href="{% url 'enrollment_list' %}" class="nav-link" style="background: #edf2f7;">✅ Gerenciar Matrículas</a>
+                        <a href="{% url 'personal_list' %}" class="nav-link" style="background: #edf2f7;">🧑‍🏫 Gerenciar Personais</a>
+                        <a href="{% url 'workout_list' %}" class="nav-link" style="background: #edf2f7;">💪 Gerenciar Treinos</a>
+                        <a href="/admin/" class="nav-link" style="background: #edf2f7; color: #744ba2;">⚙️ Área Administrativa</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            // Configurações globais do Chart.js
+            Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+            Chart.defaults.color = '#4a5568';
+
+            // 1. Gráfico de Planos (Pizza)
+            new Chart(document.getElementById('plansChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: {{ plan_labels|safe }},
+                    datasets: [{
+                        data: {{ plan_values|safe }},
+                        backgroundColor: [
+                            '#667eea', '#764ba2', '#4c51bf', '#a779e9', '#63b3ed'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    resizeDelay: 200,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+
+            // 2. Gráfico de Acessos (Linha)
+            new Chart(document.getElementById('accessChart'), {
+                type: 'line',
+                data: {
+                    labels: {{ access_labels|safe }},
+                    datasets: [{
+                        label: 'Acessos',
+                        data: {{ access_values|safe }},
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#764ba2'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    resizeDelay: 200,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // 3. Gráfico de Personais (Barra)
+            new Chart(document.getElementById('personalsChart'), {
+                type: 'bar',
+                data: {
+                    labels: {{ personal_labels|safe }},
+                    datasets: [{
+                        label: 'Clientes',
+                        data: {{ personal_values|safe }},
+                        backgroundColor: '#764ba2',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    resizeDelay: 200,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        </script>
+    {% endif %}
+{% endblock %}

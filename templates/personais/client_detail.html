@@ -1,0 +1,99 @@
+{% extends 'base_portal.html' %}
+
+{% block content %}
+<style>
+    .detail-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; }
+    .detail-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .meta-item { background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%); border-left: 3px solid #667eea; border-radius: 8px; padding: 1rem 1.25rem; }
+    .meta-item span { display: block; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: #718096; margin-bottom: 0.25rem; }
+    .meta-item strong { font-size: 1rem; color: #1a202c; }
+    .workout-row { display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 1.1rem; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 0.5rem; background: #fafafa; transition: box-shadow 0.2s; }
+    .workout-row:hover { box-shadow: 0 4px 10px rgba(102,126,234,0.1); }
+    .workout-info strong { display: block; color: #1a202c; font-size: 0.95rem; }
+    .workout-info small { color: #718096; font-size: 0.82rem; }
+    .workout-badge { background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); color: #667eea; border-radius: 20px; padding: 0.2rem 0.7rem; font-size: 0.8rem; font-weight: 600; }
+    .action-links a { margin-right: 0.75rem; }
+    .btn-danger { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 0.7rem 1.4rem; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(239,68,68,0.3); transition: all 0.3s; }
+    .btn-danger:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(239,68,68,0.45); }
+    .section-title { font-size: 1.1rem; font-weight: 700; color: #2d3748; margin: 1.5rem 0 0.75rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+</style>
+
+<div class="detail-header">
+    <div>
+        <h2>{{ client.first_name }} {{ client.last_name }}</h2>
+        <p style="color:#718096; margin-top:0.25rem;">
+            Personal: <strong>{{ client.personal }}</strong>
+            {% if client.academy_member %}&mdash; <span style="color:#10b981;">Tambem aluno na academia</span>{% endif %}
+        </p>
+    </div>
+    <div class="action-links">
+        <a class="button-link" href="{% url 'personal_client_edit' client.pk %}">Editar</a>
+        {% if not client.academy_member %}
+            <a class="button-link" href="{% url 'move_client_to_academy' client.pk %}">Enviar para academia</a>
+        {% endif %}
+        <a class="btn-danger" href="{% url 'personal_client_delete' client.pk %}">Excluir</a>
+    </div>
+</div>
+
+<div class="detail-meta">
+    <div class="meta-item">
+        <span>E-mail</span>
+        <strong>{{ client.email|default:'—' }}</strong>
+    </div>
+    <div class="meta-item">
+        <span>Telefone</span>
+        <strong>{{ client.phone|default:'—' }}</strong>
+    </div>
+    <div class="meta-item">
+        <span>Data de nascimento</span>
+        <strong>{{ client.born_at|date:'d/m/Y'|default:'—' }}</strong>
+    </div>
+    <div class="meta-item">
+        <span>Treinos cadastrados</span>
+        <strong>{{ workouts.count }}</strong>
+    </div>
+</div>
+
+{% if client.goal %}
+    <div style="background:#f0fdf4; border-left:3px solid #10b981; border-radius:8px; padding:1rem 1.25rem; margin-bottom:1.5rem;">
+        <strong>Objetivo:</strong> {{ client.goal }}
+    </div>
+{% endif %}
+
+{% if client.observations %}
+    <div style="background:#fffbeb; border-left:3px solid #f59e0b; border-radius:8px; padding:1rem 1.25rem; margin-bottom:1.5rem;">
+        <strong>Observacoes:</strong>
+        <p style="margin-top:0.4rem;">{{ client.observations }}</p>
+    </div>
+{% endif %}
+
+<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-top:1.5rem;">
+    <p class="section-title" style="margin:0;">Treinos</p>
+    <a class="button-link" href="{% url 'workout_create' %}?client={{ client.pk }}" style="padding:0.6rem 1.2rem; font-size:0.88rem;">+ Novo treino</a>
+</div>
+
+<div style="margin-top:0.75rem;">
+    {% for workout in workouts %}
+        <div class="workout-row">
+            <div class="workout-info">
+                <strong>{{ workout.name }}</strong>
+                <small>{{ workout.exercises.count }} exercicio{{ workout.exercises.count|pluralize }} &mdash; Atualizado {{ workout.updated_at|date:'d/m/Y' }}</small>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+                {% if workout.goal %}<span class="workout-badge">{{ workout.goal }}</span>{% endif %}
+                <a href="{% url 'workout_detail' workout.pk %}" style="color:#667eea; font-weight:600; font-size:0.9rem;">Ver</a>
+                <a href="{% url 'workout_print' workout.pk %}" target="_blank" style="color:#667eea; font-weight:600; font-size:0.9rem;">Imprimir</a>
+                <a href="{% url 'workout_edit' workout.pk %}" style="color:#667eea; font-weight:600; font-size:0.9rem;">Editar</a>
+                <a href="{% url 'workout_delete' workout.pk %}" style="color:#ef4444; font-weight:600; font-size:0.9rem;">Excluir</a>
+            </div>
+        </div>
+    {% empty %}
+        <p style="color:#a0aec0; padding:1rem 0;">Nenhum treino cadastrado para este cliente. <a href="{% url 'workout_create' %}" style="color:#667eea;">Criar primeiro treino</a></p>
+    {% endfor %}
+</div>
+
+<div class="button-group" style="margin-top:2rem;">
+    <a class="button-link" href="{% url 'personal_detail' client.personal.pk %}">Ver personal</a>
+    <a class="button-link" href="{% url 'personal_client_list' %}">Voltar aos clientes</a>
+</div>
+{% endblock %}

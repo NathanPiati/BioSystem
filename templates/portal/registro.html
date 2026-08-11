@@ -1,0 +1,64 @@
+{% extends 'base_portal.html' %}
+
+{% block content %}
+<style>
+    .register-wrap { max-width: 520px; margin: 0 auto; }
+    .register-wrap h2 { font-size: 1.75rem; font-weight: 800; color: #064e3b; margin-bottom: 0.35rem; }
+    .register-wrap p { color: #6b7280; margin-bottom: 2rem; }
+    .section-divider { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #10b981; margin: 1.5rem 0 1rem; padding-bottom: 0.4rem; border-bottom: 2px solid #d1fae5; }
+    .login-link { text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: #6b7280; }
+    .login-link a { color: #059669; font-weight: 600; text-decoration: none; }
+    .login-link a:hover { text-decoration: underline; }
+</style>
+
+<div class="register-wrap">
+    <h2>{% if profile_only %}Completar perfil{% else %}Criar conta{% endif %}</h2>
+    <p>{% if profile_only %}Preencha seus dados de personal trainer para acessar o portal.{% else %}Cadastre-se para acessar o Portal Personal Trainer.{% endif %}</p>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        <p class="section-divider">Dados pessoais</p>
+        {% for field in form %}
+            {% if field.name != 'username' and field.name != 'password' and field.name != 'password_confirm' %}
+                <div class="form-row">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.errors %}<small style="color:#dc2626;">{{ field.errors|join:', ' }}</small>{% endif %}
+                </div>
+            {% endif %}
+        {% endfor %}
+
+        {% if not profile_only %}
+        <p class="section-divider">Acesso ao portal</p>
+        {% for field in form %}
+            {% if field.name == 'username' or field.name == 'password' or field.name == 'password_confirm' %}
+                <div class="form-row">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.errors %}<small style="color:#dc2626;">{{ field.errors|join:', ' }}</small>{% endif %}
+                </div>
+            {% endif %}
+        {% endfor %}
+        {% endif %}
+
+        {% if form.non_field_errors %}
+            <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:8px; padding:0.9rem 1.1rem; color:#dc2626; margin-top:1rem;">
+                {{ form.non_field_errors|join:', ' }}
+            </div>
+        {% endif %}
+
+        <div class="button-group">
+            <button type="submit" style="width:100%; justify-content:center;">
+                {% if profile_only %}Salvar perfil{% else %}Criar minha conta{% endif %}
+            </button>
+        </div>
+    </form>
+
+    {% if not profile_only %}
+    <div class="login-link">
+        Já tem conta? <a href="{% url 'login' %}">Entrar</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

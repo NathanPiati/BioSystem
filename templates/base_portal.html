@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title|default:'Portal Personal' }} — BioSystem PT</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/biosystem-mobile.css' %}">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%); color: #1a202c; min-height: 100vh; }
+
+        header { background: rgba(255,255,255,0.97); box-shadow: 0 4px 24px rgba(0,0,0,0.12); position: sticky; top: 0; z-index: 1000; }
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 0; gap: 1rem; }
+        .brand { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: #1a202c; }
+        .brand-logo { width: 38px; height: 38px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; box-shadow: 0 4px 12px rgba(16,185,129,0.35); flex-shrink: 0; }
+        .brand h1 { font-size: 1.3rem; font-weight: 800; background: linear-gradient(135deg, #10b981 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .brand-tag { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #10b981; background: #ecfdf5; padding: 0.15rem 0.5rem; border-radius: 20px; margin-left: 0.2rem; }
+        nav.site-nav { display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap; }
+        .nav-link { padding: 0.5rem 0.85rem; border-radius: 7px; text-decoration: none; color: #4a5568; font-weight: 500; font-size: 0.875rem; transition: all 0.25s; white-space: nowrap; }
+        .nav-link:hover { color: #059669; background: #ecfdf5; }
+        .nav-link.active { color: #059669; background: #d1fae5; font-weight: 600; }
+        .nav-divider { width: 1px; height: 20px; background: #e2e8f0; margin: 0 0.25rem; }
+        .user-section { display: flex; align-items: center; gap: 0.75rem; }
+        .user-label { font-weight: 600; color: #2d3748; font-size: 0.875rem; }
+        .logout-btn { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.45rem 1.1rem; border-radius: 7px; cursor: pointer; font-weight: 600; font-size: 0.875rem; transition: all 0.25s; box-shadow: 0 4px 12px rgba(16,185,129,0.35); }
+        .logout-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(16,185,129,0.5); }
+        .back-to-main { font-size: 0.78rem; color: #a0aec0; text-decoration: none; padding: 0.35rem 0.7rem; border-radius: 6px; border: 1px solid #e2e8f0; transition: all 0.2s; }
+        .back-to-main:hover { color: #667eea; border-color: #667eea; background: #f0f4ff; }
+
+        main { padding: 2rem 0 3rem; }
+        .card { background: white; border-radius: 14px; padding: 2rem; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
+
+        .form-row { margin-bottom: 1.4rem; }
+        .form-row label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2d3748; font-size: 0.9rem; }
+        .form-row input, .form-row select, .form-row textarea {
+            width: 100%; padding: 0.8rem 1rem; border: 2px solid #e2e8f0; border-radius: 8px;
+            background: #f9fafb; font-size: 0.95rem; transition: all 0.25s; color: #1a202c;
+        }
+        .form-row input:focus, .form-row select:focus, .form-row textarea:focus {
+            outline: none; border-color: #10b981; background: white; box-shadow: 0 0 0 3px rgba(16,185,129,0.12);
+        }
+        .card input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+        .card select, .card textarea {
+            width: 100%; padding: 0.8rem 1rem; border: 2px solid #e2e8f0; border-radius: 8px;
+            background: #f9fafb; font-size: 0.95rem; box-sizing: border-box; color: #1a202c;
+        }
+
+        .button-group { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.5rem; }
+        button[type="submit"], .button-link {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white; border: none; padding: 0.8rem 1.6rem; border-radius: 8px;
+            cursor: pointer; text-decoration: none; font-weight: 600; font-size: 0.9rem;
+            transition: all 0.25s; box-shadow: 0 4px 12px rgba(16,185,129,0.3); display: inline-block;
+        }
+        button[type="submit"]:hover, .button-link:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16,185,129,0.45); }
+        .btn-danger { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important; box-shadow: 0 4px 12px rgba(239,68,68,0.3) !important; }
+        .btn-danger:hover { box-shadow: 0 6px 20px rgba(239,68,68,0.45) !important; }
+        .btn-secondary { background: linear-gradient(135deg, #718096 0%, #4a5568 100%) !important; box-shadow: 0 4px 12px rgba(113,128,150,0.3) !important; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 0; }
+        th, td { padding: 0.9rem 1rem; border-bottom: 1px solid #e2e8f0; text-align: left; font-size: 0.9rem; }
+        th { background: #f0fdf4; font-weight: 700; color: #065f46; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; }
+        tr:hover td { background: #f9fafb; }
+
+        .meta-item { background: linear-gradient(135deg, #10b98110 0%, #05966910 100%); border-left-color: #10b981; }
+
+        .messages { position: fixed; top: 1.25rem; right: 1.25rem; z-index: 9999; max-width: 380px; }
+        .message { display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.75rem; padding: 0.9rem 1.25rem; border-radius: 10px; animation: slideIn 0.3s ease; box-shadow: 0 8px 24px rgba(0,0,0,0.18); }
+        @keyframes slideIn { from { transform: translateX(420px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(420px); opacity: 0; } }
+        .message.success { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
+        .message.error   { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; }
+        .message.warning { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; }
+        .message.info    { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; }
+        .message-close { background: none; border: none; color: inherit; cursor: pointer; font-size: 1.1rem; opacity: 0.7; margin-left: auto; box-shadow: none; padding: 0; }
+        .message-close:hover { opacity: 1; transform: none; }
+
+        footer { text-align: center; padding: 1.5rem 0; color: rgba(255,255,255,0.55); font-size: 0.82rem; }
+
+        @media (max-width: 640px) {
+            .messages { left: 1rem; right: 1rem; max-width: none; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-top">
+                <div class="header-brand-row">
+                    <a href="{% url 'portal_home' %}" class="brand">
+                        <div class="brand-logo">💪</div>
+                        <h1>BioSystem</h1>
+                        <span class="brand-tag">Portal PT</span>
+                    </a>
+                    <button type="button" class="nav-toggle" aria-label="Abrir menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+                </div>
+                <nav class="site-nav">
+                    <a href="{% url 'portal_home' %}" class="nav-link {% if request.resolver_match.url_name == 'portal_home' %}active{% endif %}">🏠 Dashboard</a>
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'personal_list' %}" class="nav-link {% if 'personal_list' in request.resolver_match.url_name %}active{% endif %}">🧑‍🏫 Personais</a>
+                        <a href="{% url 'personal_client_list' %}" class="nav-link {% if 'personal_client' in request.resolver_match.url_name %}active{% endif %}">👥 Clientes</a>
+                        <a href="{% url 'workout_list' %}" class="nav-link {% if 'workout' in request.resolver_match.url_name %}active{% endif %}">📋 Treinos</a>
+                        <a href="{% url 'exercise_list' %}" class="nav-link {% if 'exercise' in request.resolver_match.url_name %}active{% endif %}">🏋️ Exercícios</a>
+                        <div class="nav-divider"></div>
+                        <a href="{% url 'home' %}" class="back-to-main">← Academia</a>
+                        <div class="nav-divider"></div>
+                        <div class="user-section">
+                            <span class="user-label">{{ request.user.personaltrainer.first_name|default:request.user.username }}</span>
+                            <form method="post" action="{% url 'logout' %}" style="display:inline; margin:0;">
+                                {% csrf_token %}
+                                <button type="submit" class="logout-btn">Sair</button>
+                            </form>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'portal_register' %}" class="nav-link">Criar conta</a>
+                        <a href="{% url 'login' %}" class="logout-btn">Entrar</a>
+                    {% endif %}
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message {% if message.tags %}{{ message.tags }}{% endif %}" data-message>
+                    <div style="flex:1;">{{ message }}</div>
+                    <button class="message-close" type="button" onclick="this.parentElement.remove()">×</button>
+                </div>
+            {% endfor %}
+        </div>
+        <script>
+            document.querySelectorAll('[data-message]').forEach(msg => {
+                setTimeout(() => { msg.style.animation = 'slideOut 0.3s ease'; setTimeout(() => msg.remove(), 300); }, 5000);
+            });
+        </script>
+    {% endif %}
+
+    <main>
+        <div class="container">
+            <div class="card">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">BioSystem — Portal de Gestão para Personal Trainers</div>
+    </footer>
+    <script>
+        document.querySelectorAll('.site-nav .nav-link, .site-nav .logout-btn, .site-nav .back-to-main').forEach(el => {
+            el.addEventListener('click', () => document.body.classList.remove('nav-open'));
+        });
+    </script>
+</body>
+</html>

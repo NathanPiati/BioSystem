@@ -1,0 +1,166 @@
+{% extends 'base_portal.html' %}
+
+{% block content %}
+<style>
+    .portal-hero { margin-bottom: 2rem; }
+    .portal-hero h2 { font-size: 1.9rem; font-weight: 800; color: #064e3b; }
+    .portal-hero p { color: #6b7280; margin-top: 0.35rem; }
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card { border-radius: 12px; padding: 1.35rem 1.25rem; text-align: center; position: relative; overflow: hidden; }
+    .stat-card::before { content: ''; position: absolute; inset: 0; opacity: 0.08; border-radius: 12px; }
+    .stat-green { background: #ecfdf5; border: 1.5px solid #a7f3d0; }
+    .stat-blue  { background: #eff6ff; border: 1.5px solid #bfdbfe; }
+    .stat-amber { background: #fffbeb; border: 1.5px solid #fde68a; }
+    .stat-rose  { background: #fff1f2; border: 1.5px solid #fecdd3; }
+    .stat-card .icon { font-size: 1.75rem; margin-bottom: 0.4rem; }
+    .stat-card .value { font-size: 2rem; font-weight: 800; color: #1a202c; line-height: 1; }
+    .stat-card .label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; margin-top: 0.3rem; font-weight: 600; }
+    .sections-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; }
+    .section-panel { border: 1.5px solid #e2e8f0; border-radius: 12px; overflow: hidden; }
+    .section-panel-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; background: #f0fdf4; border-bottom: 1px solid #d1fae5; }
+    .section-panel-header h3 { font-size: 0.95rem; font-weight: 700; color: #065f46; }
+    .section-panel-header a { font-size: 0.8rem; color: #059669; font-weight: 600; text-decoration: none; }
+    .section-panel-header a:hover { text-decoration: underline; }
+    .section-panel-body { padding: 0.5rem 0; }
+    .list-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1.25rem; border-bottom: 1px solid #f3f4f6; transition: background 0.15s; }
+    .list-item:last-child { border-bottom: none; }
+    .list-item:hover { background: #f9fafb; }
+    .list-item-main strong { display: block; font-size: 0.9rem; color: #1a202c; }
+    .list-item-main small { font-size: 0.78rem; color: #9ca3af; }
+    .list-item-right { font-size: 0.8rem; color: #059669; font-weight: 600; text-decoration: none; white-space: nowrap; }
+    .empty-state { padding: 1.5rem 1.25rem; text-align: center; color: #9ca3af; font-size: 0.88rem; }
+    .quick-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; margin-bottom: 2rem; }
+    .quick-btn { display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.25rem; border-radius: 10px; text-decoration: none; border: 1.5px solid #d1fae5; background: #f0fdf4; color: #065f46; font-weight: 600; font-size: 0.88rem; transition: all 0.2s; }
+    .quick-btn:hover { background: #d1fae5; border-color: #6ee7b7; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16,185,129,0.15); }
+    .quick-btn .qicon { font-size: 1.5rem; }
+    .alert-warn { background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 10px; padding: 0.9rem 1.25rem; color: #92400e; font-size: 0.88rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.6rem; }
+</style>
+
+{% if no_access %}
+    <div style="text-align:center; padding:4rem 0;">
+        <div style="font-size:4rem; margin-bottom:1rem;">🔒</div>
+        <h2 style="color:#064e3b; margin-bottom:0.5rem;">Acesso restrito</h2>
+        <p style="color:#6b7280; margin-bottom:2rem;">Sua conta não está vinculada a nenhum personal trainer.<br>Crie uma conta de personal ou peça ao administrador para vincular seu acesso.</p>
+        <a href="{% url 'portal_register' %}" class="button-link">Criar conta de personal</a>
+    </div>
+{% elif not request.user.is_authenticated %}
+    <div style="text-align:center; padding:4rem 0;">
+        <div style="font-size:4rem; margin-bottom:1rem;">💪</div>
+        <h2 style="color:#064e3b; margin-bottom:0.5rem;">Portal Personal Trainer</h2>
+        <p style="color:#6b7280; margin-bottom:2rem;">Faça login para acessar o portal.</p>
+        <a href="{% url 'login' %}" class="button-link">Entrar</a>
+    </div>
+{% else %}
+    <div class="portal-hero">
+        <h2>{% if personal %}Olá, {{ personal.first_name }}! 👋{% else %}Dashboard do Portal PT{% endif %}</h2>
+        <p>{% if personal %}Gerencie seus clientes e treinos.{% else %}Visão geral de todos os personais, clientes e treinos.{% endif %}</p>
+    </div>
+
+    {% if clients_without_workout %}
+    <div class="alert-warn">
+        ⚠️ <strong>{{ clients_without_workout }} cliente{{ clients_without_workout|pluralize }}</strong> ainda não possui nenhum treino cadastrado.
+        <a href="{% url 'personal_client_list' %}" style="color:#d97706; font-weight:700; margin-left:0.5rem;">Ver clientes →</a>
+    </div>
+    {% endif %}
+
+    <div class="stats-row">
+        <div class="stat-card stat-green">
+            <div class="icon">🧑‍🏫</div>
+            <div class="value">{{ total_personals }}</div>
+            <div class="label">Personais</div>
+        </div>
+        <div class="stat-card stat-blue">
+            <div class="icon">👥</div>
+            <div class="value">{{ total_clients }}</div>
+            <div class="label">Clientes PT</div>
+        </div>
+        <div class="stat-card stat-amber">
+            <div class="icon">📋</div>
+            <div class="value">{{ total_workouts }}</div>
+            <div class="label">Treinos</div>
+        </div>
+        <div class="stat-card stat-rose">
+            <div class="icon">🏋️</div>
+            <div class="value">{{ total_exercises }}</div>
+            <div class="label">Exercicios</div>
+        </div>
+    </div>
+
+    <div class="quick-actions">
+        <a href="{% url 'personal_create' %}" class="quick-btn">
+            <span class="qicon">➕</span> Novo personal
+        </a>
+        <a href="{% url 'personal_client_create' %}" class="quick-btn">
+            <span class="qicon">👤</span> Novo cliente
+        </a>
+        <a href="{% url 'workout_create' %}" class="quick-btn">
+            <span class="qicon">💪</span> Novo treino
+        </a>
+        <a href="{% url 'workout_list' %}" class="quick-btn">
+            <span class="qicon">📄</span> Ver todos treinos
+        </a>
+    </div>
+
+    <div class="sections-grid">
+        <div class="section-panel">
+            <div class="section-panel-header">
+                <h3>Personais ativos</h3>
+                <a href="{% url 'personal_list' %}">Ver todos →</a>
+            </div>
+            <div class="section-panel-body">
+                {% for personal in recent_personals %}
+                    <div class="list-item">
+                        <div class="list-item-main">
+                            <strong>{{ personal.first_name }} {{ personal.last_name }}</strong>
+                            <small>{{ personal.clients.count }} cliente{{ personal.clients.count|pluralize }}</small>
+                        </div>
+                        <a href="{% url 'personal_detail' personal.pk %}" class="list-item-right">Ver perfil →</a>
+                    </div>
+                {% empty %}
+                    <div class="empty-state">Nenhum personal cadastrado.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="section-panel">
+            <div class="section-panel-header">
+                <h3>Treinos recentes</h3>
+                <a href="{% url 'workout_list' %}">Ver todos →</a>
+            </div>
+            <div class="section-panel-body">
+                {% for workout in recent_workouts %}
+                    <div class="list-item">
+                        <div class="list-item-main">
+                            <strong>{{ workout.name }}</strong>
+                            <small>{{ workout.client }} · {{ workout.updated_at|date:'d/m/Y' }}</small>
+                        </div>
+                        <a href="{% url 'workout_detail' workout.pk %}" class="list-item-right">Abrir →</a>
+                    </div>
+                {% empty %}
+                    <div class="empty-state">Nenhum treino cadastrado.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="section-panel">
+            <div class="section-panel-header">
+                <h3>Clientes recentes</h3>
+                <a href="{% url 'personal_client_list' %}">Ver todos →</a>
+            </div>
+            <div class="section-panel-body">
+                {% for client in recent_clients %}
+                    <div class="list-item">
+                        <div class="list-item-main">
+                            <strong>{{ client.first_name }} {{ client.last_name }}</strong>
+                            <small>{{ client.personal.first_name }} · {{ client.workouts.count }} treino{{ client.workouts.count|pluralize }}</small>
+                        </div>
+                        <a href="{% url 'personal_client_detail' client.pk %}" class="list-item-right">Ver →</a>
+                    </div>
+                {% empty %}
+                    <div class="empty-state">Nenhum cliente cadastrado.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

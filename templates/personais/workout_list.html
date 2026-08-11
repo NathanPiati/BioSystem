@@ -1,0 +1,60 @@
+{% extends 'base_portal.html' %}
+
+{% block content %}
+    <h2>Treinos dos clientes</h2>
+    <p>Treinos montados pelos personais para seus proprios clientes.</p>
+
+    <form method="get" style="margin-top: 1rem;">
+        <div class="form-row">
+            <label for="client">Filtrar por cliente</label>
+            <select name="client" id="client">
+                <option value="">Todos</option>
+                {% for client in clients %}
+                    <option value="{{ client.id }}" {% if request.GET.client == client.id|stringformat:'s' %}selected{% endif %}>
+                        {{ client.first_name }} {{ client.last_name }} - {{ client.personal.first_name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="button-group">
+            <button type="submit">Filtrar</button>
+            <a class="button-link" href="{% url 'workout_create' %}">Novo treino</a>
+        </div>
+    </form>
+
+    <div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Treino</th>
+                <th>Cliente</th>
+                <th>Personal</th>
+                <th>Objetivo</th>
+                <th>Atualizado</th>
+                <th>Acoes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for workout in workouts %}
+                <tr>
+                    <td>{{ workout.name }}</td>
+                    <td>{{ workout.client.first_name }} {{ workout.client.last_name }}</td>
+                    <td>{{ workout.personal.first_name }} {{ workout.personal.last_name }}</td>
+                    <td>{{ workout.goal|default:'-' }}</td>
+                    <td>{{ workout.updated_at|date:'d/m/Y H:i' }}</td>
+                    <td class="table-actions">
+                        <a href="{% url 'workout_detail' workout.pk %}">Ver</a>
+                        <a href="{% url 'workout_print' workout.pk %}" target="_blank">Imprimir</a>
+                        <a href="{% url 'workout_edit' workout.pk %}">Editar</a>
+                        <a href="{% url 'workout_delete' workout.pk %}" style="color:#ef4444;">Excluir</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6">Nenhum treino cadastrado.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+{% endblock %}

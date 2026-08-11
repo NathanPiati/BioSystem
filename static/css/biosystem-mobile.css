@@ -1,0 +1,379 @@
+/* BioSystem — utilitários responsivos compartilhados */
+
+/* ── Navegação mobile ── */
+.header-brand-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+}
+
+.nav-toggle {
+    display: none;
+    background: none;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.45rem 0.7rem;
+    font-size: 1.35rem;
+    line-height: 1;
+    cursor: pointer;
+    color: inherit;
+    flex-shrink: 0;
+}
+
+.nav-toggle:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+/* ── Tabelas com scroll horizontal ── */
+.table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-top: 1rem;
+}
+
+.table-wrap table {
+    min-width: 560px;
+}
+
+.table-actions {
+    white-space: nowrap;
+}
+
+.table-actions a {
+    display: inline-block;
+    margin-right: 0.35rem;
+}
+
+/* ── Cabeçalhos de detalhe (compartilhado entre páginas PT) ── */
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.detail-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.meta-item {
+    background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+    border-left: 3px solid #667eea;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+}
+
+.meta-item span {
+    display: block;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #718096;
+    margin-bottom: 0.25rem;
+}
+
+.meta-item strong {
+    font-size: 1rem;
+    color: #1a202c;
+}
+
+.action-links a {
+    margin-right: 0.75rem;
+}
+
+/* ── Badges simples ── */
+.badge {
+    display: inline-block;
+    padding: 0.2rem 0.55rem;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.badge-success { background: #d1fae5; color: #065f46; }
+.badge-warning { background: #fef3c7; color: #92400e; }
+.badge-danger  { background: #fee2e2; color: #991b1b; }
+.badge-info    { background: #dbeafe; color: #1e40af; }
+.badge-muted   { background: #f3f4f6; color: #6b7280; }
+
+/* ── Paginação simples ── */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+    list-style: none;
+    padding: 0;
+}
+
+.pagination a,
+.pagination span {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+
+.pagination a {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.pagination span {
+    background: #f7fafc;
+    color: #4a5568;
+    border: 1px solid #e2e8f0;
+}
+
+/* ── Filtros empilháveis ── */
+.filter-bar {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    margin-bottom: 1.5rem;
+}
+
+.filter-bar .form-row {
+    margin: 0;
+    flex: 1;
+    min-width: 160px;
+}
+
+/* ── Breakpoints ── */
+@media (max-width: 768px) {
+    .nav-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .header-top {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+    }
+
+    nav.site-nav {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        gap: 0.35rem;
+        padding: 0.75rem 0 0.25rem;
+        border-top: 1px solid #e2e8f0;
+        margin-top: 0.75rem;
+    }
+
+    body.nav-open nav.site-nav {
+        display: flex;
+    }
+
+    nav.site-nav .nav-link {
+        width: 100%;
+        text-align: center;
+        padding: 0.65rem 1rem;
+        white-space: normal;
+    }
+
+    nav.site-nav .nav-divider {
+        display: none;
+    }
+
+    nav.site-nav .user-section {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.5rem;
+        padding-top: 0.25rem;
+    }
+
+    nav.site-nav .logout-btn {
+        width: 100%;
+    }
+
+    .container {
+        padding: 0 1rem;
+    }
+
+    main {
+        padding: 1.25rem 0 2rem;
+    }
+
+    .card {
+        padding: 1.25rem;
+        border-radius: 10px;
+    }
+
+    .card h2 {
+        font-size: 1.35rem;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    .button-group .button-link,
+    .button-group button[type="submit"],
+    .button-group button:not(.nav-toggle):not(.message-close) {
+        width: 100%;
+        text-align: center;
+    }
+
+    .detail-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .action-links {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .action-links a {
+        margin-right: 0;
+        text-align: center;
+    }
+
+    .detail-meta {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .workout-row {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 0.75rem;
+    }
+
+    .workout-row > div:last-child {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    th, td {
+        padding: 0.65rem 0.5rem;
+        font-size: 0.82rem;
+    }
+
+    .table-actions {
+        white-space: normal;
+    }
+
+    .table-actions a {
+        display: block;
+        margin: 0 0 0.3rem;
+        padding: 0.4rem 0.6rem;
+        background: #f7fafc;
+        border-radius: 6px;
+        text-align: center;
+        font-weight: 600;
+    }
+
+    .filter-bar {
+        flex-direction: column;
+    }
+
+    .filter-bar .form-row {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .exercise-card {
+        grid-template-columns: 2rem 1fr 1fr 1fr !important;
+        gap: 0.5rem 0.75rem !important;
+    }
+
+    .exercise-stat {
+        display: block !important;
+    }
+
+    .map-container {
+        height: 50vh !important;
+        min-height: 280px;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .chart-container {
+        height: 260px !important;
+    }
+
+    .stats-grid,
+    .stats-row {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    .sections-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .quick-actions {
+        grid-template-columns: 1fr !important;
+    }
+
+    .portal-hero h2 {
+        font-size: 1.45rem !important;
+    }
+
+    .list-item {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 0.35rem;
+    }
+
+    .list-item-right {
+        white-space: normal !important;
+    }
+
+    .client-card {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 0.75rem;
+    }
+
+    .client-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+    }
+
+    .client-actions a {
+        margin-left: 0 !important;
+        padding: 0.4rem 0.6rem;
+        background: #f7fafc;
+        border-radius: 6px;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .detail-meta,
+    .stats-grid,
+    .stats-row {
+        grid-template-columns: 1fr !important;
+    }
+
+    .brand h1 {
+        font-size: 1.15rem;
+    }
+
+    .exercise-card {
+        grid-template-columns: 2rem 1fr !important;
+    }
+
+    .exercise-stat:nth-child(n+4) {
+        grid-column: 2;
+    }
+}

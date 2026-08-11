@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/biosystem-mobile.css' %}">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #2d3748; min-height: 100vh; }
+        header { background: white; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15); position: sticky; top: 0; z-index: 1000; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; gap: 1rem; }
+        .brand { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: #1a202c; }
+        .brand h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.5px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .brand span { font-size: 1.25rem; }
+        nav.site-nav { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+        .nav-link { padding: 0.5rem 0.9rem; border-radius: 6px; text-decoration: none; color: #4a5568; font-weight: 500; font-size: 0.9rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; white-space: nowrap; }
+        .nav-link::before { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 2px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: width 0.3s ease; }
+        .nav-link:hover::before { width: 100%; }
+        .nav-link:hover { color: #667eea; background: rgba(102, 126, 234, 0.08); }
+        .nav-divider { width: 1px; height: 20px; background: #e2e8f0; margin: 0 0.25rem; }
+        .user-section { display: flex; align-items: center; gap: 0.8rem; }
+        .user-label { font-weight: 600; color: #2d3748; font-size: 0.9rem; }
+        .logout-form { display: inline; margin: 0; }
+        .logout-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 0.5rem 1.2rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); }
+        .logout-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6); }
+        main { padding: 2.5rem 0; }
+        .card { background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); }
+        .card h2 { color: #1a202c; margin-bottom: 1rem; font-size: 1.75rem; }
+        .dashboard-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .card-item { background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); border-left: 4px solid; border-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%) 1; border-radius: 12px; padding: 1.5rem; }
+        .card-item strong { color: #667eea; font-size: 1.5rem; }
+        footer { text-align: center; padding: 2rem 0; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem; }
+        .form-row { margin-bottom: 1.5rem; }
+        .form-row label { display: block; margin-bottom: 0.6rem; font-weight: 600; color: #2d3748; }
+        .form-row input, .form-row select, .form-row textarea { width: 100%; padding: 0.9rem 1rem; border: 2px solid #e2e8f0; border-radius: 8px; background: #f7fafc; font-size: 1rem; transition: all 0.3s ease; }
+        .form-row input:focus, .form-row select:focus, .form-row textarea:focus { outline: none; border-color: #667eea; background: white; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+        .card input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+        .card select, .card textarea {
+            width: 100%; padding: 0.9rem 1rem; border: 2px solid #e2e8f0; border-radius: 8px;
+            background: #f7fafc; font-size: 1rem; box-sizing: border-box;
+        }
+        .button-group { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem; }
+        button, .button-link { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 0.9rem 1.8rem; border-radius: 8px; cursor: pointer; text-decoration: none; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); display: inline-block; }
+        button:hover, .button-link:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5); }
+        table { width: 100%; border-collapse: collapse; margin-top: 0; }
+        th, td { padding: 1rem 0.85rem; border-bottom: 1px solid #e2e8f0; text-align: left; }
+        th { background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); font-weight: 700; color: #2d3748; }
+        tr:hover { background: #f7fafc; }
+        .messages { position: fixed; top: 1.5rem; right: 1.5rem; z-index: 9999; max-width: 400px; }
+        .message { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; padding: 1rem 1.5rem; border-radius: 10px; animation: slideIn 0.3s ease; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); }
+        @keyframes slideIn { from { transform: translateX(500px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(500px); opacity: 0; } }
+        .message.success { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
+        .message.error { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; }
+        .message.warning { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; }
+        .message.info { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; }
+        .message-icon { font-size: 1.5rem; flex-shrink: 0; }
+        .message-content { flex: 1; }
+        .message-close { background: none; border: none; color: inherit; cursor: pointer; font-size: 1.25rem; opacity: 0.7; transition: opacity 0.2s; box-shadow: none; padding: 0; }
+        .message-close:hover { opacity: 1; transform: none; }
+        @media (max-width: 768px) {
+            .dashboard-cards { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 640px) {
+            .messages { left: 1rem; right: 1rem; max-width: none; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-top">
+                <div class="header-brand-row">
+                    <a href="{% url 'home' %}" class="brand">
+                        <span>🏋️</span>
+                        <h1>BioSystem</h1>
+                    </a>
+                    <button type="button" class="nav-toggle" aria-label="Abrir menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+                </div>
+                <nav class="site-nav">
+                    <a href="{% url 'home' %}" class="nav-link">Início</a>
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'member_list' %}" class="nav-link">👥 Alunos</a>
+                        <a href="{% url 'member_map' %}" class="nav-link">🗺️ Mapa</a>
+                        <a href="{% url 'plan_list' %}" class="nav-link">📋 Planos</a>
+                        <a href="{% url 'enrollment_list' %}" class="nav-link">✅ Matrículas</a>
+                        <a href="{% url 'access_log_list' %}" class="nav-link">🚪 Logs</a>
+                        <div class="nav-divider"></div>
+                        <a href="{% url 'portal_home' %}" class="nav-link" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; font-weight: 700;">💪 Portal PT</a>
+                        <div class="nav-divider"></div>
+                        <a href="/admin/" class="nav-link">⚙️ Admin</a>
+                        <div class="nav-divider"></div>
+                        <div class="user-section">
+                            <span class="user-label">{{ request.user.username }}</span>
+                            <form method="post" action="{% url 'logout' %}" class="logout-form">
+                                {% csrf_token %}
+                                <button type="submit" class="logout-btn">Sair</button>
+                            </form>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="logout-btn">Entrar</a>
+                    {% endif %}
+                </nav>
+            </div>
+        </div>
+    </header>
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message {% if message.tags %}{{ message.tags }}{% endif %}" data-message>
+                    <span class="message-icon">
+                        {% if message.tags == 'success' %}✓{% elif message.tags == 'error' %}✕{% elif message.tags == 'warning' %}⚠{% else %}ℹ{% endif %}
+                    </span>
+                    <div class="message-content">
+                        {{ message }}
+                    </div>
+                    <button class="message-close" type="button" onclick="this.parentElement.remove()">×</button>
+                </div>
+            {% endfor %}
+        </div>
+        <script>
+            document.querySelectorAll('[data-message]').forEach(msg => {
+                setTimeout(() => {
+                    msg.style.animation = 'slideOut 0.3s ease';
+                    setTimeout(() => msg.remove(), 300);
+                }, 5000);
+            });
+        </script>
+    {% endif %}
+    <main>
+        <div class="container">
+            <div class="card">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </main>
+    <footer>
+        <div class="container">
+            Sistema web para academias criado com Django e PostgreSQL.
+        </div>
+    </footer>
+    <script>
+        document.querySelectorAll('.site-nav .nav-link, .site-nav .logout-btn').forEach(el => {
+            el.addEventListener('click', () => document.body.classList.remove('nav-open'));
+        });
+    </script>
+</body>
+</html>

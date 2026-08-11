@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>{% if object %}Editar matrícula{% else %}Nova matrícula{% endif %}</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-row">
+            <label for="id_member">Aluno</label>
+            {{ form.member }}
+        </div>
+        <div class="form-row">
+            <label for="id_plan">Plano</label>
+            {{ form.plan }}
+        </div>
+        <div class="form-row">
+            <label for="id_start_date">Data de início</label>
+            {{ form.start_date }}
+        </div>
+        <div class="form-row">
+            <label for="id_end_date">Data de término</label>
+            {{ form.end_date }}
+        </div>
+        <div class="button-group">
+            <button type="submit">Salvar</button>
+            <a class="button-link" href="{% url 'enrollment_list' %}">Cancelar</a>
+        </div>
+    </form>
+{% endblock %}

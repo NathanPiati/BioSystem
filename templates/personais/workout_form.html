@@ -1,0 +1,120 @@
+{% extends 'base_portal.html' %}
+
+{% block content %}
+<style>
+    .exercise-table-wrap { overflow-x: auto; }
+    .exercise-table { min-width: 700px; }
+    .exercise-table input[type="number"],
+    .exercise-table input[type="text"] { padding: 0.5rem 0.6rem; width: 100%; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.9rem; }
+    .exercise-table input:focus { outline: none; border-color: #10b981; box-shadow: 0 0 0 2px rgba(16,185,129,0.15); }
+    .btn-add-row { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.65rem 1.4rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(16,185,129,0.3); transition: all 0.3s; }
+    .btn-add-row:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(16,185,129,0.45); }
+    .delete-cell { text-align: center; }
+</style>
+
+{# Biblioteca de exercícios para autocomplete #}
+<datalist id="exercise-library">
+    {% for ex in exercises %}
+        <option value="{{ ex.name }}"{% if ex.muscle_group %} label="{{ ex.get_muscle_group_display }}"{% endif %}>
+    {% endfor %}
+</datalist>
+
+<h2>{{ title }}</h2>
+
+<form method="post" id="workout-form">
+    {% csrf_token %}
+    {% for field in form %}
+        <div class="form-row">
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.errors %}
+                <small style="color: #dc2626;">{{ field.errors|join:', ' }}</small>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-top: 2rem; margin-bottom:0.75rem;">
+        <h3>Exercicios</h3>
+        <button type="button" class="btn-add-row" id="add-exercise">+ Adicionar exercicio</button>
+    </div>
+
+    {{ formset.management_form }}
+
+    <div class="exercise-table-wrap">
+        <table class="exercise-table">
+            <thead>
+                <tr>
+                    <th style="width:60px;">Ordem</th>
+                    <th>Exercicio</th>
+                    <th style="width:70px;">Series</th>
+                    <th style="width:90px;">Reps</th>
+                    <th style="width:90px;">Carga</th>
+                    <th style="width:100px;">Descanso (s)</th>
+                    <th style="width:60px;">Rem.</th>
+                </tr>
+            </thead>
+            <tbody id="exercise-tbody">
+                {% for item_form in formset %}
+                    <tr {% if item_form.instance.pk %}data-existing="true"{% endif %}>
+                        <td>{{ item_form.id }}{{ item_form.order }}</td>
+                        <td>{{ item_form.name }}</td>
+                        <td>{{ item_form.sets }}</td>
+                        <td>{{ item_form.reps }}</td>
+                        <td>{{ item_form.load }}</td>
+                        <td>{{ item_form.rest_seconds }}</td>
+                        <td class="delete-cell">{{ item_form.DELETE }}</td>
+                    </tr>
+                    {% if item_form.non_field_errors %}
+                        <tr>
+                            <td colspan="7">
+                                <small style="color: #dc2626;">{{ item_form.non_field_errors|join:', ' }}</small>
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="button-group">
+        <button type="submit">Salvar treino</button>
+        <a class="button-link" href="{% url 'workout_list' %}" style="background: linear-gradient(135deg, #718096 0%, #4a5568 100%); box-shadow: 0 4px 15px rgba(113,128,150,0.3);">Voltar</a>
+    </div>
+</form>
+
+<script>
+(function () {
+    const totalFormsInput = document.getElementById('id_workoutexercise_set-TOTAL_FORMS');
+    const tbody = document.getElementById('exercise-tbody');
+
+    function wireDatalist(row) {
+        const nameInput = row.querySelector('input[name$="-name"]');
+        if (nameInput) nameInput.setAttribute('list', 'exercise-library');
+    }
+
+    // Adiciona datalist nas linhas já existentes
+    tbody.querySelectorAll('tr').forEach(wireDatalist);
+
+    const emptyRow = tbody.querySelector('tr:not([data-existing])');
+
+    document.getElementById('add-exercise').addEventListener('click', function () {
+        const count = parseInt(totalFormsInput.value);
+        const newRow = emptyRow.cloneNode(true);
+
+        newRow.querySelectorAll('input, select').forEach(function (el) {
+            el.name = el.name.replace(/-\d+-/, '-' + count + '-');
+            el.id   = el.id.replace(/-\d+-/, '-' + count + '-');
+            if (el.type === 'checkbox') el.checked = false;
+            else if (el.type !== 'hidden') el.value = '';
+        });
+
+        const orderInput = newRow.querySelector('input[name$="-order"]');
+        if (orderInput) orderInput.value = count + 1;
+
+        wireDatalist(newRow);
+        tbody.appendChild(newRow);
+        totalFormsInput.value = count + 1;
+    });
+})();
+</script>
+{% endblock %}

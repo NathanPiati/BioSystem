@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Logs de Acesso da Catraca</h2>
+    <p>Histórico de entradas e saídas registradas pela catraca.</p>
+
+    <form method="get" class="filter-bar" style="margin-top: 1rem;">
+        <div class="form-row">
+            <label for="member">Aluno</label>
+            <select name="member" id="member">
+                <option value="">Todos os alunos</option>
+                {% for member in members %}
+                <option value="{{ member.id }}" {% if request.GET.member == member.id|stringformat:"s" %}selected{% endif %}>
+                    {{ member }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-row">
+            <label for="date_from">Data inicial</label>
+            <input type="date" name="date_from" id="date_from" value="{{ request.GET.date_from }}">
+        </div>
+        <div class="form-row">
+            <label for="date_to">Data final</label>
+            <input type="date" name="date_to" id="date_to" value="{{ request.GET.date_to }}">
+        </div>
+        <div class="button-group" style="margin-top: 0;">
+            <button type="submit">Filtrar</button>
+            <a class="button-link" href="{% url 'access_log_list' %}">Limpar</a>
+        </div>
+    </form>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Data/Hora</th>
+                    <th>Aluno</th>
+                    <th>Tipo</th>
+                    <th>Status</th>
+                    <th>Método</th>
+                    <th>Confiança</th>
+                    <th>ID Cartão</th>
+                    <th>Catraca</th>
+                    <th>Motivo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in access_logs %}
+                <tr>
+                    <td>{{ log.timestamp|date:"d/m/Y H:i:s" }}</td>
+                    <td>
+                        {% if log.member %}
+                            <a href="{% url 'member_edit' log.member.id %}">{{ log.member }}</a>
+                        {% else %}
+                            <span style="color:#9ca3af;">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if log.access_type == 'entry' %}
+                            <span class="badge badge-success">Entrada</span>
+                        {% else %}
+                            <span class="badge badge-warning">Saída</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if log.success %}
+                            <span class="badge badge-success">Permitido</span>
+                        {% else %}
+                            <span class="badge badge-danger">Negado</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if log.auth_method == 'face' %}
+                            <span class="badge badge-info">Facial</span>
+                        {% elif log.auth_method == 'fingerprint' %}
+                            <span class="badge badge-info">Digital</span>
+                        {% elif log.auth_method == 'card_biometric' %}
+                            <span class="badge badge-muted">Cartão + Bio</span>
+                        {% else %}
+                            <span class="badge badge-muted">Cartão</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if log.biometric_confidence %}
+                            {{ log.biometric_confidence|floatformat:1 }}%
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td><code style="font-size:0.78rem;">{{ log.card_id }}</code></td>
+                    <td>{{ log.turnstile_id|default:"N/A" }}</td>
+                    <td>
+                        {% if log.reason %}
+                            <small style="color:#dc2626;">{{ log.reason }}</small>
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" style="text-align:center; color:#9ca3af; padding:2rem;">
+                        Nenhum log encontrado.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if is_paginated %}
+    <ul class="pagination">
+        {% if page_obj.has_previous %}
+        <li><a href="?page={{ page_obj.previous_page_number }}{% if request.GET.member %}&member={{ request.GET.member }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}">Anterior</a></li>
+        {% endif %}
+        <li><span>Página {{ page_obj.number }} de {{ paginator.num_pages }}</span></li>
+        {% if page_obj.has_next %}
+        <li><a href="?page={{ page_obj.next_page_number }}{% if request.GET.member %}&member={{ request.GET.member }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}">Próximo</a></li>
+        {% endif %}
+    </ul>
+    {% endif %}
+{% endblock %}
