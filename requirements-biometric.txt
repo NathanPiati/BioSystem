@@ -1,0 +1,3 @@
+# Dependencias opcionais para biometria (instalar localmente se necessario)
+face-recognition
+opencv-python

@@ -3,6 +3,4 @@ psycopg2-binary
 gunicorn
 requests
 Pillow
-face-recognition
-opencv-python
 numpy

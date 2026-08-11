@@ -26,9 +26,15 @@ if not SECRET_KEY:
     SECRET_KEY = 'django-insecure-iq_r0a2*d*a8z3w9(l0q)a$zs-yzyk175az^5+#vx=&9b_@gx%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('true', '1', 'yes')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',')
+    if host.strip()
+]
+if DEBUG and not ALLOWED_HOSTS:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
 
 
 # Application definition
@@ -80,11 +86,11 @@ WSGI_APPLICATION = 'biosystem.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'AcademiaDB',
-        'USER': 'biosystem_user',
-        'PASSWORD': 'Inovatech2025@',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.environ.get('DB_NAME', 'AcademiaDB'),
+        'USER': os.environ.get('DB_USER', 'biosystem_user'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'Inovatech2025@'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
 

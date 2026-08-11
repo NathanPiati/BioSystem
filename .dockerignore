@@ -1,0 +1,16 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.git/
+.gitignore
+.env
+.env.local
+*.rar
+*.zip
+*.7z
+BioSystem.rar
+.vscode/
+.idea/
+db.sqlite3
+media/

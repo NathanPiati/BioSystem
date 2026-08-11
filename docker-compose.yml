@@ -1,0 +1,9 @@
+services:
+  biosystem:
+    build: .
+    container_name: biosystem
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    env_file:
+      - .env
