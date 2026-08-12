@@ -111,16 +111,19 @@
     // Adiciona datalist nas linhas já existentes
     tbody.querySelectorAll('tr').forEach(wireDatalist);
 
-    const emptyRow = tbody.querySelector('tr:not([data-existing])');
+    const templateRow = tbody.querySelector('tr:not([data-existing])') || tbody.querySelector('tr');
 
     document.getElementById('add-exercise').addEventListener('click', function () {
+        if (!totalFormsInput || !templateRow) return;
+
         const count = parseInt(totalFormsInput.value);
-        const newRow = emptyRow.cloneNode(true);
+        const newRow = templateRow.cloneNode(true);
 
         newRow.querySelectorAll('input, select').forEach(function (el) {
             el.name = el.name.replace(/-\d+-/, '-' + count + '-');
             el.id   = el.id.replace(/-\d+-/, '-' + count + '-');
-            if (el.type === 'checkbox') el.checked = false;
+            if (el.type === 'hidden') el.value = '';
+            else if (el.type === 'checkbox') el.checked = false;
             else if (el.type !== 'hidden') el.value = '';
         });
 
