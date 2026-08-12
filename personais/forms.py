@@ -109,6 +109,12 @@ WorkoutExerciseFormSet = inlineformset_factory(
     Workout,
     WorkoutExercise,
     fields=['order', 'name', 'sets', 'reps', 'load', 'rest_seconds'],
+    widgets={
+        'order': forms.NumberInput(attrs={'min': 1, 'step': 1, 'inputmode': 'numeric'}),
+        'sets': forms.NumberInput(attrs={'min': 1, 'step': 1, 'inputmode': 'numeric'}),
+        'name': forms.TextInput(attrs={'autocomplete': 'off'}),
+        'rest_seconds': forms.NumberInput(attrs={'min': 0, 'step': 5, 'inputmode': 'numeric'}),
+    },
     extra=1,
     can_delete=True,
 )

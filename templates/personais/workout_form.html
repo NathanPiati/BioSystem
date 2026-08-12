@@ -3,10 +3,26 @@
 {% block content %}
 <style>
     .exercise-table-wrap { overflow-x: auto; }
-    .exercise-table { min-width: 700px; }
+    .exercise-table { min-width: 860px; }
     .exercise-table input[type="number"],
-    .exercise-table input[type="text"] { padding: 0.5rem 0.6rem; width: 100%; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.9rem; }
+    .exercise-table input[type="text"] { padding: 0.5rem 0.6rem; width: 100%; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.9rem; background: #fff; color: #1a202c; }
+    .exercise-table input[type="number"] {
+        min-width: 84px;
+        text-align: center;
+        appearance: textfield;
+        -moz-appearance: textfield;
+    }
+    .exercise-table input[type="number"]::-webkit-outer-spin-button,
+    .exercise-table input[type="number"]::-webkit-inner-spin-button {
+        opacity: 1;
+        margin: 0;
+    }
     .exercise-table input:focus { outline: none; border-color: #10b981; box-shadow: 0 0 0 2px rgba(16,185,129,0.15); }
+    .exercise-table td { min-width: 92px; }
+    .exercise-table td:first-child,
+    .exercise-table th:first-child { min-width: 100px; }
+    .exercise-table td:last-child,
+    .exercise-table th:last-child { min-width: 70px; text-align: center; }
     .btn-add-row { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.65rem 1.4rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(16,185,129,0.3); transition: all 0.3s; }
     .btn-add-row:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(16,185,129,0.45); }
     .delete-cell { text-align: center; }
@@ -44,9 +60,9 @@
         <table class="exercise-table">
             <thead>
                 <tr>
-                    <th style="width:60px;">Ordem</th>
+                    <th style="width:100px;">Ordem</th>
                     <th>Exercicio</th>
-                    <th style="width:70px;">Series</th>
+                    <th style="width:100px;">Series</th>
                     <th style="width:90px;">Reps</th>
                     <th style="width:90px;">Carga</th>
                     <th style="width:100px;">Descanso (s)</th>
