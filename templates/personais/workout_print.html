@@ -20,7 +20,7 @@
 
         .toolbar {
             width: 100%;
-            max-width: 380px;
+            max-width: 80mm;
             display: flex;
             gap: 0.5rem;
             margin-bottom: 1rem;
@@ -57,11 +57,25 @@
 
         .receipt {
             width: 100%;
-            max-width: 380px;
+            max-width: 80mm;
             background: #fff;
             padding: 1.25rem 1.1rem 1.5rem;
             box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
             position: relative;
+        }
+
+        @media (max-width: 420px) {
+            body { padding-left: 0.5rem; padding-right: 0.5rem; }
+
+            .toolbar { max-width: 100%; }
+
+            .receipt {
+                padding-left: 0.9rem;
+                padding-right: 0.9rem;
+            }
+
+            .receipt::before,
+            .receipt::after { margin-left: -0.9rem; margin-right: -0.9rem; }
         }
 
         .receipt::before,
@@ -196,21 +210,33 @@
         }
 
         @media print {
+            @page {
+                size: 80mm auto;
+                margin: 0;
+            }
+
             body {
                 background: #fff;
                 padding: 0;
+                width: 80mm;
+                min-width: 80mm;
             }
 
             .toolbar { display: none; }
 
             .receipt {
-                max-width: 100%;
+                width: 80mm;
+                max-width: 80mm;
                 box-shadow: none;
-                padding: 0;
+                padding: 1.25rem 1.1rem 1.5rem;
             }
 
             .receipt::before,
-            .receipt::after { display: none; }
+            .receipt::after {
+                display: block;
+                margin-left: -1.1rem;
+                margin-right: -1.1rem;
+            }
         }
     </style>
 </head>
