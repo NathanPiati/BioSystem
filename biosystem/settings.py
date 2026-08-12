@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
+from urllib.parse import urlsplit
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,10 +29,32 @@ if not SECRET_KEY:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('true', '1', 'yes')
 
+
+def _normalize_allowed_host(raw_host: str) -> str:
+    host = raw_host.strip().strip('"').strip("'")
+    if not host:
+        return ''
+
+    if '://' in host:
+        host = urlsplit(host).netloc or urlsplit(host).path
+
+    if host.startswith('['):
+        closing = host.find(']')
+        if closing != -1:
+            return host[:closing + 1]
+
+    if ':' in host:
+        host = host.split(':', 1)[0]
+
+    return host.strip()
+
+
+raw_allowed_hosts = os.environ.get('DJANGO_ALLOWED_HOSTS', '')
+allowed_host_candidates = raw_allowed_hosts.replace(';', ',').split(',')
 ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',')
-    if host.strip()
+    normalized
+    for normalized in (_normalize_allowed_host(host) for host in allowed_host_candidates)
+    if normalized
 ]
 if DEBUG and not ALLOWED_HOSTS:
     ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
