@@ -275,7 +275,12 @@ def process_face_image(image_data):
     image_data: base64 string da imagem
     """
     try:
-        from PIL import Image
+        try:
+            from PIL import Image
+        except ImportError:
+            return {
+                'error': 'Dependência opcional Pillow não instalada para biometria facial'
+            }
 
         # Decodificar base64
         image_data = image_data.split(

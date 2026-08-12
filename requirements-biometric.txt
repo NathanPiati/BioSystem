@@ -1,3 +1,4 @@
 # Dependencias opcionais para biometria (instalar localmente se necessario)
+Pillow
 face-recognition
 opencv-python
