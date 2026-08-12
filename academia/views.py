@@ -11,7 +11,6 @@ import requests
 import json
 import base64
 from io import BytesIO
-from PIL import Image
 
 from .models import AccessLog, Enrollment, Member, Plan
 from personais.models import PersonalTrainer, PersonalClient, Workout
@@ -58,7 +57,8 @@ def home(request):
 
     # Dados para gráficos
     # 1. Alunos por Plano
-    plans_data = Plan.objects.annotate(num_members=Count('enrollment')).values('name', 'num_members')
+    plans_data = Plan.objects.annotate(num_members=Count(
+        'enrollment')).values('name', 'num_members')
     plan_labels = [p['name'] for p in plans_data]
     plan_values = [p['num_members'] for p in plans_data]
 
@@ -69,12 +69,13 @@ def home(request):
         .values('day') \
         .annotate(count=Count('id')) \
         .order_by('day')
-    
+
     access_labels = [str(a['day']) for a in access_data]
     access_values = [a['count'] for a in access_data]
 
     # 3. Clientes por Personal
-    personals_data = PersonalTrainer.objects.annotate(num_clients=Count('clients')).values('first_name', 'num_clients')
+    personals_data = PersonalTrainer.objects.annotate(
+        num_clients=Count('clients')).values('first_name', 'num_clients')
     personal_labels = [p['first_name'] for p in personals_data]
     personal_values = [p['num_clients'] for p in personals_data]
 
@@ -274,6 +275,8 @@ def process_face_image(image_data):
     image_data: base64 string da imagem
     """
     try:
+        from PIL import Image
+
         # Decodificar base64
         image_data = image_data.split(
             ',')[1] if ',' in image_data else image_data
