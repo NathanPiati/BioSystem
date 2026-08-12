@@ -14,8 +14,12 @@ from pathlib import Path
 import os
 from urllib.parse import urlsplit
 
+from dotenv import load_dotenv
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
@@ -49,15 +53,30 @@ def _normalize_allowed_host(raw_host: str) -> str:
     return host.strip()
 
 
-raw_allowed_hosts = os.environ.get('DJANGO_ALLOWED_HOSTS', '')
+raw_allowed_hosts = os.environ.get(
+    'DJANGO_ALLOWED_HOSTS',
+    'inovacore.api.br,www.inovacore.api.br,localhost,127.0.0.1,[::1]',
+)
 allowed_host_candidates = raw_allowed_hosts.replace(';', ',').split(',')
 ALLOWED_HOSTS = [
     normalized
     for normalized in (_normalize_allowed_host(host) for host in allowed_host_candidates)
     if normalized
 ]
-if DEBUG and not ALLOWED_HOSTS:
+if not ALLOWED_HOSTS:
     ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
+
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get(
+        'DJANGO_CSRF_TRUSTED_ORIGINS',
+        'https://inovacore.api.br,https://www.inovacore.api.br,'
+        'http://inovacore.api.br,http://www.inovacore.api.br,'
+        'http://inovacore.api.br:8001,http://www.inovacore.api.br:8001,'
+        'https://inovacore.api.br:8001,https://www.inovacore.api.br:8001',
+    ).replace(';', ',').split(',')
+    if origin.strip()
+]
 
 
 # Application definition
