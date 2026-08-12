@@ -100,7 +100,7 @@
 
 <script>
 (function () {
-    const totalFormsInput = document.getElementById('id_workoutexercise_set-TOTAL_FORMS');
+    const totalFormsInput = document.querySelector('input[name$="-TOTAL_FORMS"]');
     const tbody = document.getElementById('exercise-tbody');
 
     function wireDatalist(row) {
