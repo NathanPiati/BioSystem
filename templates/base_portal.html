@@ -88,10 +88,19 @@
 
             .container { width: 100%; padding: 0 0.85rem; }
             .header-top { padding: 0.65rem 0; }
+            .header-brand-row { width: 100%; min-width: 0; }
             .brand { min-width: 0; gap: 0.5rem; }
             .brand-logo { width: 34px; height: 34px; font-size: 1.05rem; }
             .brand h1 { font-size: 1.1rem; }
             .brand-tag { display: none; }
+            .nav-toggle { display: flex; flex: 0 0 auto; }
+            nav.site-nav { display: none; width: 100%; flex-direction: column; align-items: stretch; }
+            body.nav-open nav.site-nav { display: flex; }
+            nav.site-nav .nav-link,
+            nav.site-nav .back-to-main,
+            nav.site-nav .logout-btn { width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: center; text-align: center; }
+            nav.site-nav .nav-divider { display: none; }
+            nav.site-nav .user-section { width: 100%; flex-direction: column; }
 
             main { padding: 0.85rem 0 1.75rem; }
             .card { width: 100%; padding: 1rem; border-radius: 10px; }
@@ -115,8 +124,20 @@
             .detail-header > div,
             .detail-meta { width: 100%; }
             .detail-header { gap: 0.75rem; margin-bottom: 1.25rem; }
-            .detail-meta { grid-template-columns: 1fr; gap: 0.65rem; margin-bottom: 1.25rem; }
+            .detail-meta,
+            .stats-row,
+            .sections-grid,
+            .quick-actions,
+            .dashboard-grid,
+            .stats-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 0.65rem; }
+            .detail-meta { margin-bottom: 1.25rem; }
             .meta-item { padding: 0.8rem 1rem; }
+
+            .exercise-card { grid-template-columns: minmax(0, 1fr) !important; gap: 0.65rem !important; align-items: stretch !important; }
+            .exercise-card > * { min-width: 0; }
+            .exercise-order { margin-bottom: 0.15rem; }
+            .exercise-stat { display: flex !important; justify-content: space-between; align-items: center; text-align: left; padding-top: 0.45rem; border-top: 1px solid #edf2f7; }
+            .exercise-stat span { display: inline !important; }
 
             .form-row { margin-bottom: 1rem; }
             .form-row input,
@@ -168,6 +189,9 @@
                 grid-template-columns: repeat(2, minmax(0, 1fr));
                 gap: 0.4rem;
             }
+            .section-panel,
+            .stats-row > *,
+            .quick-actions > * { min-width: 0; max-width: 100%; }
             .client-actions a,
             .workout-row > div:last-child a {
                 min-height: 40px;
