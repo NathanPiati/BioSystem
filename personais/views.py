@@ -2,11 +2,12 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.views import LoginView
 from django.db.models import Q
 from django.forms import modelform_factory
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views.generic import DeleteView, DetailView, ListView, UpdateView
 
 from academia.models import Member
@@ -51,6 +52,22 @@ class StaffRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
 
     def test_func(self):
         return self.request.user.is_staff or self.request.user.is_superuser
+
+
+class PortalLoginView(LoginView):
+    """Envia personais ao portal e usuarios da academia para a academia."""
+
+    template_name = 'registration/login.html'
+
+    def get_success_url(self):
+        if _get_personal(self.request.user) is not None:
+            return reverse('portal_home')
+        return super().get_success_url()
+
+    def get_default_redirect_url(self):
+        if _get_personal(self.request.user) is not None:
+            return reverse('portal_home')
+        return reverse('home')
 
 
 # ── Portal home ────────────────────────────────────────────────────────────────
