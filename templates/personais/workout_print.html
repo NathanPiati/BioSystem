@@ -47,6 +47,11 @@
 
         .btn-print:hover { background: #333; }
 
+        .btn-print:disabled {
+            cursor: wait;
+            opacity: 0.7;
+        }
+
         .btn-back {
             background: #fff;
             color: #333;
@@ -249,7 +254,7 @@
 </head>
 <body>
     <div class="toolbar no-print">
-        <button class="btn-print" onclick="window.print()">Imprimir</button>
+        <button type="button" class="btn-print" id="print-workout" aria-label="Imprimir ficha de treino">Imprimir</button>
         <a class="btn-back" href="{% url 'workout_detail' workout.pk %}">Voltar</a>
     </div>
 
@@ -325,5 +330,33 @@
             BioSystem — Portal Personal Trainer
         </footer>
     </article>
+
+    <script>
+        (function () {
+            const printButton = document.getElementById('print-workout');
+
+            if (!printButton) return;
+
+            printButton.addEventListener('click', function () {
+                if (typeof window.print !== 'function') {
+                    printButton.textContent = 'Impressao indisponivel';
+                    return;
+                }
+
+                printButton.disabled = true;
+                printButton.textContent = 'Abrindo impressao...';
+                window.focus();
+
+                // O atraso permite ao navegador mobile finalizar a renderizacao antes do dialogo.
+                window.setTimeout(function () {
+                    window.print();
+                    window.setTimeout(function () {
+                        printButton.disabled = false;
+                        printButton.textContent = 'Imprimir';
+                    }, 800);
+                }, 100);
+            });
+        }());
+    </script>
 </body>
 </html>
