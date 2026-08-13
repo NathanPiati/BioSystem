@@ -129,15 +129,38 @@
             .sections-grid,
             .quick-actions,
             .dashboard-grid,
-            .stats-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 0.65rem; }
+            .stats-grid {
+                display: grid;
+                grid-template-columns: none !important;
+                grid-auto-flow: column;
+                grid-auto-columns: minmax(250px, 82vw);
+                gap: 0.65rem;
+                width: 100%;
+                max-width: 100%;
+                overflow-x: auto;
+                overscroll-behavior-inline: contain;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: thin;
+                padding-bottom: 0.35rem;
+            }
             .detail-meta { margin-bottom: 1.25rem; }
             .meta-item { padding: 0.8rem 1rem; }
 
-            .exercise-card { grid-template-columns: minmax(0, 1fr) !important; gap: 0.65rem !important; align-items: stretch !important; }
+            .exercise-card {
+                grid-template-columns: 2.5rem 180px repeat(4, minmax(78px, auto)) !important;
+                width: 100%;
+                min-width: 0;
+                max-width: 100%;
+                gap: 0.65rem !important;
+                overflow-x: auto;
+                overscroll-behavior-inline: contain;
+                -webkit-overflow-scrolling: touch;
+                align-items: center !important;
+            }
             .exercise-card > * { min-width: 0; }
             .exercise-order { margin-bottom: 0.15rem; }
-            .exercise-stat { display: flex !important; justify-content: space-between; align-items: center; text-align: left; padding-top: 0.45rem; border-top: 1px solid #edf2f7; }
-            .exercise-stat span { display: inline !important; }
+            .exercise-stat { display: block !important; text-align: center; padding-top: 0; border-top: none; }
+            .exercise-stat span { display: block !important; }
 
             .form-row { margin-bottom: 1rem; }
             .form-row input,
