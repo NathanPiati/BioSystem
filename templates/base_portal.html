@@ -63,6 +63,7 @@
         th, td { padding: 0.9rem 1rem; border-bottom: 1px solid #e2e8f0; text-align: left; font-size: 0.9rem; }
         th { background: #f0fdf4; font-weight: 700; color: #065f46; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; }
         tr:hover td { background: #f9fafb; }
+        .table-scroll-hint { display: none; }
 
         .meta-item { background: linear-gradient(135deg, #10b98110 0%, #05966910 100%); border-left-color: #10b981; }
 
@@ -88,7 +89,7 @@
 
             .container { width: 100%; padding: 0 0.85rem; }
             .header-top { padding: 0.65rem 0; }
-            .header-brand-row { width: 100%; min-width: 0; }
+            .header-brand-row { display: flex; width: 100%; min-width: 0; justify-content: space-between; align-items: center; }
             .brand { min-width: 0; gap: 0.5rem; }
             .brand-logo { width: 34px; height: 34px; font-size: 1.05rem; }
             .brand h1 { font-size: 1.1rem; }
@@ -176,12 +177,15 @@
             .table-wrap {
                 width: 100%;
                 max-width: 100%;
+                height: auto;
+                min-height: 0;
                 margin-left: 0;
                 margin-right: 0;
                 border: 1px solid #e2e8f0;
                 border-radius: 8px;
+                touch-action: pan-x pan-y;
             }
-            .table-wrap table { min-width: 620px; }
+            .table-wrap table { min-width: 620px; width: max-content; }
             .table-wrap th,
             .table-wrap td { padding: 0.7rem 0.6rem; vertical-align: top; }
             .table-actions { white-space: normal; min-width: 92px; }
@@ -197,6 +201,14 @@
                 background: #f8fafc;
             }
             .table-actions a:last-child { margin-bottom: 0; }
+
+            .table-scroll-hint {
+                display: block;
+                margin: 0.5rem 0 0.35rem;
+                color: #718096;
+                font-size: 0.75rem;
+                text-align: center;
+            }
 
             .filter-bar,
             .card > form[method="get"] { width: 100%; }
