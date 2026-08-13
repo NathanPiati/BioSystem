@@ -210,6 +210,30 @@
                 text-align: center;
             }
 
+            .workout-list-table-wrap {
+                display: block;
+                overflow-x: scroll !important;
+                overflow-y: hidden;
+                height: auto !important;
+                max-height: none !important;
+                scrollbar-width: auto;
+            }
+            .workout-list-table-wrap table {
+                width: 900px !important;
+                min-width: 900px !important;
+                table-layout: auto;
+            }
+            .workout-list-table-wrap .table-actions { white-space: nowrap; }
+            .workout-list-table-wrap .table-actions a {
+                display: inline-flex;
+                width: auto;
+                min-width: 64px;
+                min-height: 40px;
+                margin: 0 0.25rem 0 0;
+                padding: 0.45rem 0.55rem;
+                vertical-align: top;
+            }
+
             .filter-bar,
             .card > form[method="get"] { width: 100%; }
             .filter-bar .form-row,
