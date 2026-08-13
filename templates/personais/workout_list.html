@@ -6,6 +6,10 @@
 
     <form method="get" style="margin-top: 1rem;">
         <div class="form-row">
+            <label for="q">Buscar treino</label>
+            <input type="search" name="q" id="q" value="{{ request.GET.q }}" placeholder="Nome, objetivo ou cliente">
+        </div>
+        <div class="form-row">
             <label for="client">Filtrar por cliente</label>
             <select name="client" id="client">
                 <option value="">Todos</option>
@@ -16,14 +20,27 @@
                 {% endfor %}
             </select>
         </div>
+        {% if personals %}
+        <div class="form-row">
+            <label for="personal">Filtrar por personal</label>
+            <select name="personal" id="personal">
+                <option value="">Todos</option>
+                {% for personal in personals %}
+                    <option value="{{ personal.id }}" {% if request.GET.personal == personal.id|stringformat:'s' %}selected{% endif %}>
+                        {{ personal.first_name }} {{ personal.last_name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
         <div class="button-group">
             <button type="submit">Filtrar</button>
-            <a class="button-link" href="{% url 'workout_create' %}">Novo treino</a>
+            <a class="button-link" href="{% url 'workout_create' %}">Novo treino</a><br>
         </div>
     </form>
 
     <p class="table-scroll-hint">Deslize a tabela para o lado para ver todas as colunas.</p>
-    <div class="table-wrap workout-list-table-wrap">
+    <div class="table-wrap wide-list-table-wrap">
     <table>
         <thead>
             <tr>

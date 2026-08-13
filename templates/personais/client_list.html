@@ -1,48 +1,14 @@
 {% extends 'base_portal.html' %}
 
 {% block content %}
-<style>
-    @media (max-width: 768px) {
-        .client-list-table-wrap { overflow-x: hidden; }
-        .client-list-table-wrap table {
-            width: 100%;
-            min-width: 0;
-            table-layout: fixed;
-        }
-        .client-list-table-wrap th,
-        .client-list-table-wrap td {
-            padding: 0.55rem 0.35rem;
-            font-size: 0.74rem;
-            overflow-wrap: anywhere;
-        }
-        .client-list-table-wrap th:nth-child(1),
-        .client-list-table-wrap td:nth-child(1),
-        .client-list-table-wrap th:nth-child(3),
-        .client-list-table-wrap td:nth-child(3) { display: none; }
-        .client-list-table-wrap th:nth-child(2),
-        .client-list-table-wrap td:nth-child(2) { width: 25%; }
-        .client-list-table-wrap th:nth-child(4),
-        .client-list-table-wrap td:nth-child(4) { width: 17%; }
-        .client-list-table-wrap th:nth-child(5),
-        .client-list-table-wrap td:nth-child(5) { width: 22%; }
-        .client-list-table-wrap th:nth-child(6),
-        .client-list-table-wrap td:nth-child(6) { width: 13%; text-align: center; }
-        .client-list-table-wrap th:nth-child(7),
-        .client-list-table-wrap td:nth-child(7) { width: 23%; }
-        .client-list-table-wrap .table-actions { min-width: 0; }
-        .client-list-table-wrap .table-actions a {
-            min-height: 32px;
-            margin-bottom: 0.2rem;
-            padding: 0.35rem 0.15rem;
-            font-size: 0.7rem;
-        }
-    }
-</style>
-
     <h2>Clientes dos personais</h2>
     <p>Area separada da academia para gerenciar clientes e enviar para academia quando necessario.</p>
 
     <form method="get" style="margin-top: 1rem;">
+        <div class="form-row">
+            <label for="q">Buscar cliente</label>
+            <input type="search" name="q" id="q" value="{{ request.GET.q }}" placeholder="Nome, e-mail, telefone ou objetivo">
+        </div>
         <div class="form-row">
             <label for="personal">Filtrar por personal</label>
             <select name="personal" id="personal">
@@ -54,13 +20,22 @@
                 {% endfor %}
             </select>
         </div>
+        <div class="form-row">
+            <label for="academy">Situação na academia</label>
+            <select name="academy" id="academy">
+                <option value="">Todos</option>
+                <option value="yes" {% if request.GET.academy == 'yes' %}selected{% endif %}>Já estão na academia</option>
+                <option value="no" {% if request.GET.academy == 'no' %}selected{% endif %}>Ainda não estão na academia</option>
+            </select>
+        </div>
         <div class="button-group">
             <button type="submit">Filtrar</button>
-            <a class="button-link" href="{% url 'personal_client_create' %}">Novo cliente</a>
+            <a class="button-link" href="{% url 'personal_client_create' %}">Novo cliente</a><br>
         </div>
     </form>
 
-    <div class="table-wrap client-list-table-wrap">
+    <p class="table-scroll-hint">Deslize a tabela para o lado para ver todas as colunas.</p>
+    <div class="table-wrap wide-list-table-wrap">
     <table>
         <thead>
             <tr>

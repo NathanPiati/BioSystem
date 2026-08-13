@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.db.models import Q
 from django.forms import modelform_factory
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
@@ -203,6 +204,20 @@ class PersonalClientListView(PersonalScopedMixin, ListView):
     def get_queryset(self):
         qs = PersonalClient.objects.select_related(
             'personal', 'academy_member')
+        search = self.request.GET.get('q', '').strip()
+        academy = self.request.GET.get('academy', '').strip()
+        if search:
+            qs = qs.filter(
+                Q(first_name__icontains=search)
+                | Q(last_name__icontains=search)
+                | Q(email__icontains=search)
+                | Q(phone__icontains=search)
+                | Q(goal__icontains=search)
+            )
+        if academy == 'yes':
+            qs = qs.filter(academy_member__isnull=False)
+        elif academy == 'no':
+            qs = qs.filter(academy_member__isnull=True)
         if self.personal:
             return qs.filter(personal=self.personal)
         personal_id = self.request.GET.get('personal')
@@ -344,8 +359,19 @@ class WorkoutListView(PersonalScopedMixin, ListView):
 
     def get_queryset(self):
         qs = Workout.objects.select_related('personal', 'client')
+        search = self.request.GET.get('q', '').strip()
+        personal_id = self.request.GET.get('personal')
+        if search:
+            qs = qs.filter(
+                Q(name__icontains=search)
+                | Q(goal__icontains=search)
+                | Q(client__first_name__icontains=search)
+                | Q(client__last_name__icontains=search)
+            )
         if self.personal:
             return qs.filter(personal=self.personal)
+        if personal_id:
+            qs = qs.filter(personal_id=personal_id)
         client_id = self.request.GET.get('client')
         if client_id:
             qs = qs.filter(client_id=client_id)
@@ -359,6 +385,8 @@ class WorkoutListView(PersonalScopedMixin, ListView):
         else:
             context['clients'] = PersonalClient.objects.select_related(
                 'personal')
+            context['personals'] = PersonalTrainer.objects.filter(
+                is_active=True)
         return context
 
 
@@ -431,7 +459,8 @@ def workout_print(request, pk):
         return redirect('home')
 
     workout = get_object_or_404(
-        Workout.objects.select_related('client', 'personal').prefetch_related('exercises'),
+        Workout.objects.select_related(
+            'client', 'personal').prefetch_related('exercises'),
         pk=pk,
     )
     if personal and workout.personal != personal:
