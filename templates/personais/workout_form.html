@@ -2,7 +2,7 @@
 
 {% block content %}
 <style>
-    .exercise-table-wrap { overflow-x: auto; }
+    .exercise-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; }
     .exercise-table { min-width: 860px; }
     .exercise-table input[type="number"],
     .exercise-table input[type="text"] { padding: 0.5rem 0.6rem; width: 100%; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.9rem; background: #fff; color: #1a202c; }
@@ -26,6 +26,15 @@
     .btn-add-row { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 0.65rem 1.4rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(16,185,129,0.3); transition: all 0.3s; }
     .btn-add-row:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(16,185,129,0.45); }
     .delete-cell { text-align: center; }
+
+    @media (max-width: 768px) {
+        .exercise-table-wrap { margin-left: -0.25rem; margin-right: -0.25rem; }
+        .exercise-table { min-width: 780px; }
+        .exercise-table th, .exercise-table td { padding: 0.65rem 0.5rem; }
+        .exercise-table input[type="number"],
+        .exercise-table input[type="text"] { min-height: 44px; font-size: 1rem; }
+        .btn-add-row { width: 100%; min-height: 44px; }
+    }
 </style>
 
 {# Biblioteca de exercícios para autocomplete #}

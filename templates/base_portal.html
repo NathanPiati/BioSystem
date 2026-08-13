@@ -82,6 +82,104 @@
         @media (max-width: 640px) {
             .messages { left: 1rem; right: 1rem; max-width: none; }
         }
+
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; }
+
+            .container { width: 100%; padding: 0 0.85rem; }
+            .header-top { padding: 0.65rem 0; }
+            .brand { min-width: 0; gap: 0.5rem; }
+            .brand-logo { width: 34px; height: 34px; font-size: 1.05rem; }
+            .brand h1 { font-size: 1.1rem; }
+            .brand-tag { display: none; }
+
+            main { padding: 0.85rem 0 1.75rem; }
+            .card { width: 100%; padding: 1rem; border-radius: 10px; }
+            .card h2 { line-height: 1.2; overflow-wrap: anywhere; }
+            .card p { overflow-wrap: anywhere; }
+
+            .button-group,
+            .action-links { width: 100%; gap: 0.5rem; }
+            .button-group .button-link,
+            .button-group button,
+            .action-links .button-link {
+                min-height: 44px;
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+            }
+
+            .detail-header,
+            .detail-header > div,
+            .detail-meta { width: 100%; }
+            .detail-header { gap: 0.75rem; margin-bottom: 1.25rem; }
+            .detail-meta { grid-template-columns: 1fr; gap: 0.65rem; margin-bottom: 1.25rem; }
+            .meta-item { padding: 0.8rem 1rem; }
+
+            .form-row { margin-bottom: 1rem; }
+            .form-row input,
+            .form-row select,
+            .form-row textarea,
+            .card input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+            .card select,
+            .card textarea {
+                min-height: 44px;
+                font-size: 1rem;
+            }
+
+            .table-wrap {
+                width: 100%;
+                max-width: 100%;
+                margin-left: 0;
+                margin-right: 0;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+            }
+            .table-wrap table { min-width: 620px; }
+            .table-wrap th,
+            .table-wrap td { padding: 0.7rem 0.6rem; vertical-align: top; }
+            .table-actions { white-space: normal; min-width: 92px; }
+            .table-actions a {
+                display: block;
+                width: 100%;
+                min-height: 38px;
+                margin: 0 0 0.35rem;
+                padding: 0.5rem 0.35rem;
+                border: 1px solid #e2e8f0;
+                border-radius: 6px;
+                text-align: center;
+                background: #f8fafc;
+            }
+            .table-actions a:last-child { margin-bottom: 0; }
+
+            .filter-bar,
+            .card > form[method="get"] { width: 100%; }
+            .filter-bar .form-row,
+            .card > form[method="get"] .form-row { min-width: 0; width: 100%; }
+
+            .client-card,
+            .workout-row { width: 100%; padding: 0.9rem 0; }
+            .client-actions,
+            .workout-row > div:last-child {
+                width: 100%;
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 0.4rem;
+            }
+            .client-actions a,
+            .workout-row > div:last-child a {
+                min-height: 40px;
+                margin: 0 !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+            }
+
+            footer { padding: 1rem 0; }
+        }
     </style>
 </head>
 <body>
