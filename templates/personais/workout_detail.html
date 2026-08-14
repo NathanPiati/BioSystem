@@ -22,6 +22,10 @@
         </p>
     </div>
     <div class="action-links">
+        <form method="post" action="{% url 'workout_send_whatsapp' workout.pk %}" style="display:inline;">
+            {% csrf_token %}
+            <button class="button-link" type="submit">Enviar WhatsApp</button>
+        </form>
         <a class="button-link" href="{% url 'workout_print' workout.pk %}" target="_blank">Imprimir</a>
         <a class="button-link" href="{% url 'workout_edit' workout.pk %}">Editar treino</a>
         <a class="btn-danger" href="{% url 'workout_delete' workout.pk %}">Excluir</a>

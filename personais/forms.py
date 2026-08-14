@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
-from django.forms import inlineformset_factory
+from django.forms.models import BaseInlineFormSet, inlineformset_factory
 
 from .models import PersonalClient, PersonalTrainer, Workout, WorkoutExercise
 
@@ -65,6 +65,8 @@ class PersonalTrainerRegisterForm(forms.Form):
             password=d['password'],
             first_name=d['first_name'],
             last_name=d.get('last_name', ''),
+            is_staff=False,
+            is_superuser=False,
         )
         personal = PersonalTrainer.objects.create(
             user=user,
@@ -105,12 +107,33 @@ class PersonalTrainerProfileForm(forms.Form):
         return personal
 
 
+class WorkoutExerciseFormSetBase(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        if any(self.errors):
+            return
+
+        order = 1
+        for form in self.forms:
+            if form.cleaned_data.get('DELETE') or not form.cleaned_data.get('name'):
+                continue
+            form.cleaned_data['order'] = order
+            order += 1
+
+
 WorkoutExerciseFormSet = inlineformset_factory(
     Workout,
     WorkoutExercise,
+    formset=WorkoutExerciseFormSetBase,
     fields=['order', 'name', 'sets', 'reps', 'load', 'rest_seconds'],
     widgets={
-        'order': forms.NumberInput(attrs={'min': 1, 'step': 1, 'inputmode': 'numeric'}),
+        'order': forms.NumberInput(attrs={
+            'min': 1,
+            'step': 1,
+            'inputmode': 'numeric',
+            'readonly': True,
+            'class': 'exercise-order-input',
+        }),
         'sets': forms.NumberInput(attrs={'min': 1, 'step': 1, 'inputmode': 'numeric'}),
         'name': forms.TextInput(attrs={'autocomplete': 'off'}),
         'rest_seconds': forms.NumberInput(attrs={'min': 0, 'step': 5, 'inputmode': 'numeric'}),

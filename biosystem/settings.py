@@ -179,3 +179,7 @@ STATICFILES_DIRS = [
 
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
+
+EVOLUTION_API_URL = os.environ.get('EVOLUTION_API_URL', '').strip()
+EVOLUTION_API_KEY = os.environ.get('EVOLUTION_API_KEY', '').strip()
+EVOLUTION_API_INSTANCE = os.environ.get('EVOLUTION_API_INSTANCE', '').strip()

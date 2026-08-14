@@ -32,6 +32,8 @@ urlpatterns = [
          views.WorkoutDetailView.as_view(), name='workout_detail'),
     path('personais/treinos/<int:pk>/imprimir/',
          views.workout_print, name='workout_print'),
+    path('personais/treinos/<int:pk>/enviar-whatsapp/',
+         views.workout_send_whatsapp, name='workout_send_whatsapp'),
     path('personais/treinos/<int:pk>/editar/',
          views.workout_edit, name='workout_edit'),
     path('personais/treinos/<int:pk>/excluir/',

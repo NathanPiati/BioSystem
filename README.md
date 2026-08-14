@@ -215,3 +215,21 @@ A aplicação utiliza a API do ViaCEP para busca automática de endereços:
 - Endpoint: `/api/search-zip-code/?zip_code=00000000`
 - Formato: JSON
 - Campos retornados: rua, bairro, cidade, estado
+
+## Envio de ficha pelo WhatsApp
+
+O detalhe de cada treino possui a ação **Enviar WhatsApp**, que envia ao telefone
+cadastrado do cliente uma mensagem formatada com objetivo, exercícios, séries,
+repetições, carga, descanso e observações.
+
+Configure no `.env` do servidor os dados da instância da Evolution API:
+
+```env
+EVOLUTION_API_URL=https://seu-servidor-evolution.example.com
+EVOLUTION_API_KEY=sua-chave-da-evolution-api
+EVOLUTION_API_INSTANCE=nome-da-instancia
+```
+
+O telefone deve conter o DDD. Números brasileiros com 10 ou 11 dígitos recebem
+automaticamente o código do país `55`; números internacionais devem ser salvos
+já com o código do país.

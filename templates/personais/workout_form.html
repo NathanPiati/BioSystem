@@ -80,7 +80,7 @@
             </thead>
             <tbody id="exercise-tbody">
                 {% for item_form in formset %}
-                    <tr {% if item_form.instance.pk %}data-existing="true"{% endif %}>
+                    <tr data-exercise-row {% if item_form.instance.pk %}data-existing="true"{% endif %}>
                         <td>{{ item_form.id }}{{ item_form.order }}</td>
                         <td>{{ item_form.name }}</td>
                         <td>{{ item_form.sets }}</td>
@@ -111,6 +111,19 @@
 (function () {
     const totalFormsInput = document.querySelector('input[name$="-TOTAL_FORMS"]');
     const tbody = document.getElementById('exercise-tbody');
+    const exerciseRows = () => tbody.querySelectorAll('tr[data-exercise-row]');
+
+    function renumberRows() {
+        let order = 1;
+        exerciseRows().forEach(function (row) {
+            const deleteInput = row.querySelector('input[name$="-DELETE"]');
+            const orderInput = row.querySelector('input[name$="-order"]');
+            const deleted = deleteInput && deleteInput.checked;
+
+            row.classList.toggle('is-deleted', deleted);
+            if (!deleted && orderInput) orderInput.value = order++;
+        });
+    }
 
     function wireDatalist(row) {
         const nameInput = row.querySelector('input[name$="-name"]');
@@ -118,9 +131,10 @@
     }
 
     // Adiciona datalist nas linhas já existentes
-    tbody.querySelectorAll('tr').forEach(wireDatalist);
+    exerciseRows().forEach(wireDatalist);
+    renumberRows();
 
-    const templateRow = tbody.querySelector('tr:not([data-existing])') || tbody.querySelector('tr');
+    const templateRow = tbody.querySelector('tr[data-exercise-row]:not([data-existing])') || exerciseRows()[0];
 
     document.getElementById('add-exercise').addEventListener('click', function () {
         if (!totalFormsInput || !templateRow) return;
@@ -137,11 +151,16 @@
         });
 
         const orderInput = newRow.querySelector('input[name$="-order"]');
-        if (orderInput) orderInput.value = count + 1;
+        if (orderInput) orderInput.value = '';
 
         wireDatalist(newRow);
         tbody.appendChild(newRow);
         totalFormsInput.value = count + 1;
+        renumberRows();
+    });
+
+    tbody.addEventListener('change', function (event) {
+        if (event.target.matches('input[name$="-DELETE"]')) renumberRows();
     });
 })();
 </script>

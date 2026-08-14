@@ -263,6 +263,36 @@
 
             footer { padding: 1rem 0; }
         }
+
+        @media (max-width: 768px) {
+            nav.site-nav {
+                display: flex;
+                max-height: 0;
+                opacity: 0;
+                overflow: hidden;
+                pointer-events: none;
+                transform: translateY(-8px);
+                transition: max-height 0.35s ease, opacity 0.25s ease, transform 0.35s ease;
+            }
+            body.nav-open nav.site-nav {
+                max-height: 720px;
+                opacity: 1;
+                pointer-events: auto;
+                transform: translateY(0);
+            }
+            body.nav-open nav.site-nav > * {
+                animation: menuItemIn 0.3s ease both;
+            }
+            body.nav-open nav.site-nav > *:nth-child(2) { animation-delay: 0.03s; }
+            body.nav-open nav.site-nav > *:nth-child(3) { animation-delay: 0.06s; }
+            body.nav-open nav.site-nav > *:nth-child(4) { animation-delay: 0.09s; }
+            body.nav-open nav.site-nav > *:nth-child(5) { animation-delay: 0.12s; }
+        }
+
+        @keyframes menuItemIn {
+            from { opacity: 0; transform: translateX(-8px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
     </style>
 </head>
 <body>
@@ -275,9 +305,11 @@
                         <h1>BioSystem</h1>
                         <span class="brand-tag">Portal PT</span>
                     </a>
-                    <button type="button" class="nav-toggle" aria-label="Abrir menu" onclick="document.body.classList.toggle('nav-open')">☰</button>
+                    <button type="button" class="nav-toggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="portal-navigation">
+                        <span></span><span></span><span></span>
+                    </button>
                 </div>
-                <nav class="site-nav">
+                <nav class="site-nav" id="portal-navigation">
                     <a href="{% url 'portal_home' %}" class="nav-link {% if request.resolver_match.url_name == 'portal_home' %}active{% endif %}">🏠 Dashboard</a>
                     {% if request.user.is_authenticated %}
                         {% if request.user.is_superuser %}
@@ -333,8 +365,21 @@
         <div class="container">BioSystem — Portal de Gestão para Personal Trainers</div>
     </footer>
     <script>
+        document.querySelectorAll('.nav-toggle').forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                const isOpen = document.body.classList.toggle('nav-open');
+                toggle.setAttribute('aria-expanded', String(isOpen));
+                toggle.setAttribute('aria-label', isOpen ? 'Fechar menu' : 'Abrir menu');
+            });
+        });
         document.querySelectorAll('.site-nav .nav-link, .site-nav .logout-btn, .site-nav .back-to-main').forEach(el => {
-            el.addEventListener('click', () => document.body.classList.remove('nav-open'));
+            el.addEventListener('click', () => {
+                document.body.classList.remove('nav-open');
+                document.querySelectorAll('.nav-toggle').forEach(toggle => {
+                    toggle.setAttribute('aria-expanded', 'false');
+                    toggle.setAttribute('aria-label', 'Abrir menu');
+                });
+            });
         });
     </script>
 </body>

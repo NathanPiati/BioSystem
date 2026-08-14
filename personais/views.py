@@ -14,6 +14,7 @@ from academia.models import Member
 
 from .forms import PersonalTrainerProfileForm, PersonalTrainerRegisterForm, WorkoutExerciseFormSet, WorkoutForm
 from .models import PersonalClient, PersonalTrainer, Workout, WorkoutExercise, Exercise
+from .services import EvolutionAPIError, send_workout_message
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
@@ -22,10 +23,20 @@ def _get_personal(user):
     """Retorna o PersonalTrainer do usuário logado, ou None para staff/superuser."""
     if user.is_staff or user.is_superuser:
         return None
+
     try:
         return user.personaltrainer
     except PersonalTrainer.DoesNotExist:
         return None
+
+
+def _redirect_without_personal(request):
+    messages.error(
+        request,
+        'Você não tem acesso a esta área. Sua conta não está vinculada a '
+        'um acesso administrativo.',
+    )
+    return redirect('home')
 
 
 class PersonalScopedMixin(LoginRequiredMixin):
@@ -52,6 +63,15 @@ class StaffRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
 
     def test_func(self):
         return self.request.user.is_staff or self.request.user.is_superuser
+
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            messages.error(
+                self.request,
+                'Você não tem permissão para acessar esta área.',
+            )
+            return redirect('home')
+        return super().handle_no_permission()
 
 
 class PortalLoginView(LoginView):
@@ -150,7 +170,7 @@ class PersonalTrainerListView(StaffRequiredMixin, ListView):
 def personal_create(request):
     """Staff cria um personal junto com a conta de acesso."""
     if not (request.user.is_staff or request.user.is_superuser):
-        raise Http404
+        return _redirect_without_personal(request)
     if request.method == 'POST':
         form = PersonalTrainerRegisterForm(request.POST)
         if form.is_valid():
@@ -486,6 +506,35 @@ def workout_print(request, pk):
     return render(request, 'personais/workout_print.html', {'workout': workout})
 
 
+@login_required(login_url='login')
+def workout_send_whatsapp(request, pk):
+    if request.method != 'POST':
+        raise Http404
+
+    personal = _get_personal(request.user)
+    if not (request.user.is_staff or request.user.is_superuser) and personal is None:
+        messages.error(
+            request, 'Sua conta não está vinculada a nenhum personal trainer.')
+        return redirect('home')
+
+    workout = get_object_or_404(
+        Workout.objects.select_related(
+            'client', 'personal').prefetch_related('exercises'),
+        pk=pk,
+    )
+    if personal and workout.personal != personal:
+        raise Http404
+
+    try:
+        send_workout_message(workout)
+    except EvolutionAPIError as exc:
+        messages.error(request, str(exc))
+    else:
+        messages.success(
+            request, f'Ficha enviada para {workout.client.first_name} pelo WhatsApp.')
+    return redirect('workout_detail', pk=workout.pk)
+
+
 class WorkoutDeleteView(PersonalScopedMixin, DeleteView):
     model = Workout
     template_name = 'personais/workout_confirm_delete.html'
@@ -529,7 +578,7 @@ class ExerciseListView(PersonalScopedMixin, ListView):
 def exercise_create(request):
     personal = _get_personal(request.user)
     if not (request.user.is_staff or request.user.is_superuser) and personal is None:
-        return redirect('home')
+        return _redirect_without_personal(request)
     FormClass = modelform_factory(
         Exercise, fields=['name', 'muscle_group', 'description', 'is_active'])
     if request.method == 'POST':
@@ -547,7 +596,7 @@ def exercise_create(request):
 def exercise_edit(request, pk):
     personal = _get_personal(request.user)
     if not (request.user.is_staff or request.user.is_superuser) and personal is None:
-        return redirect('home')
+        return _redirect_without_personal(request)
     exercise = get_object_or_404(Exercise, pk=pk)
     FormClass = modelform_factory(
         Exercise, fields=['name', 'muscle_group', 'description', 'is_active'])

@@ -1,7 +1,7 @@
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView
 from django.utils import timezone
@@ -15,6 +15,34 @@ from io import BytesIO
 from .models import AccessLog, Enrollment, Member, Plan
 from personais.models import PersonalTrainer, PersonalClient, Workout
 from django.db.models import Count
+
+
+class AcademyAdminRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+    """Permite as telas da academia somente ao usuário administrador."""
+
+    login_url = reverse_lazy('login')
+
+    def test_func(self):
+        return self.request.user.is_superuser
+
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            messages.error(
+                self.request,
+                'Esta área é exclusiva do administrador da academia.',
+            )
+            return redirect('portal_home')
+        return super().handle_no_permission()
+
+
+def _redirect_personal_from_academy(request):
+    if request.user.is_authenticated and not request.user.is_superuser:
+        messages.error(
+            request,
+            'Contas de personal devem acessar somente o Portal Personal Trainer.',
+        )
+        return redirect('portal_home')
+    return None
 
 
 def search_zip_code(request):
@@ -47,6 +75,10 @@ def search_zip_code(request):
 
 
 def home(request):
+    redirect_response = _redirect_personal_from_academy(request)
+    if redirect_response:
+        return redirect_response
+
     # Dados básicos
     member_count = Member.objects.count()
     plan_count = Plan.objects.count()
@@ -99,14 +131,14 @@ def home(request):
     return render(request, 'home.html', context)
 
 
-class MemberListView(LoginRequiredMixin, ListView):
+class MemberListView(AcademyAdminRequiredMixin, ListView):
     model = Member
     template_name = 'academia/member_list.html'
     context_object_name = 'members'
     login_url = reverse_lazy('login')
 
 
-class MemberCreateView(LoginRequiredMixin, CreateView):
+class MemberCreateView(AcademyAdminRequiredMixin, CreateView):
     model = Member
     fields = ['first_name', 'last_name', 'email', 'phone', 'zip_code', 'street',
               'number', 'complement', 'neighborhood', 'city', 'state']
@@ -121,7 +153,7 @@ class MemberCreateView(LoginRequiredMixin, CreateView):
         return response
 
 
-class MemberUpdateView(LoginRequiredMixin, UpdateView):
+class MemberUpdateView(AcademyAdminRequiredMixin, UpdateView):
     model = Member
     fields = ['first_name', 'last_name', 'email', 'phone', 'zip_code', 'street',
               'number', 'complement', 'neighborhood', 'city', 'state']
@@ -138,6 +170,12 @@ class MemberUpdateView(LoginRequiredMixin, UpdateView):
 
 def member_map(request):
     """Exibe um mapa com a localização dos alunos."""
+    redirect_response = _redirect_personal_from_academy(request)
+    if redirect_response:
+        return redirect_response
+    if not request.user.is_authenticated:
+        return redirect('login')
+
     members = Member.objects.all()
     members_data = []
 
@@ -168,14 +206,14 @@ def member_map(request):
     return render(request, 'academia/member_map.html', context)
 
 
-class PlanListView(LoginRequiredMixin, ListView):
+class PlanListView(AcademyAdminRequiredMixin, ListView):
     model = Plan
     template_name = 'academia/plan_list.html'
     context_object_name = 'plans'
     login_url = reverse_lazy('login')
 
 
-class PlanCreateView(LoginRequiredMixin, CreateView):
+class PlanCreateView(AcademyAdminRequiredMixin, CreateView):
     model = Plan
     fields = ['name', 'price', 'duration_days']
     template_name = 'academia/plan_form.html'
@@ -189,7 +227,7 @@ class PlanCreateView(LoginRequiredMixin, CreateView):
         return response
 
 
-class PlanUpdateView(LoginRequiredMixin, UpdateView):
+class PlanUpdateView(AcademyAdminRequiredMixin, UpdateView):
     model = Plan
     fields = ['name', 'price', 'duration_days']
     template_name = 'academia/plan_form.html'
@@ -203,14 +241,14 @@ class PlanUpdateView(LoginRequiredMixin, UpdateView):
         return response
 
 
-class EnrollmentListView(LoginRequiredMixin, ListView):
+class EnrollmentListView(AcademyAdminRequiredMixin, ListView):
     model = Enrollment
     template_name = 'academia/enrollment_list.html'
     context_object_name = 'enrollments'
     login_url = reverse_lazy('login')
 
 
-class EnrollmentCreateView(LoginRequiredMixin, CreateView):
+class EnrollmentCreateView(AcademyAdminRequiredMixin, CreateView):
     model = Enrollment
     fields = ['member', 'plan', 'start_date', 'end_date']
     template_name = 'academia/enrollment_form.html'
@@ -224,7 +262,7 @@ class EnrollmentCreateView(LoginRequiredMixin, CreateView):
         return response
 
 
-class EnrollmentUpdateView(LoginRequiredMixin, UpdateView):
+class EnrollmentUpdateView(AcademyAdminRequiredMixin, UpdateView):
     model = Enrollment
     fields = ['member', 'plan', 'start_date', 'end_date']
     template_name = 'academia/enrollment_form.html'
@@ -238,7 +276,7 @@ class EnrollmentUpdateView(LoginRequiredMixin, UpdateView):
         return response
 
 
-class AccessLogListView(LoginRequiredMixin, ListView):
+class AccessLogListView(AcademyAdminRequiredMixin, ListView):
     model = AccessLog
     template_name = 'academia/access_log_list.html'
     context_object_name = 'access_logs'
