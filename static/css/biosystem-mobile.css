@@ -439,3 +439,96 @@ main .card {
         grid-column: 2;
     }
 }
+
+/* Ajustes finais para telas muito estreitas, inclusive na base da academia. */
+@media (max-width: 768px) {
+    html,
+    body {
+        overflow-x: hidden;
+    }
+
+    .container {
+        width: 100%;
+        padding-left: 0.85rem !important;
+        padding-right: 0.85rem !important;
+    }
+
+    main {
+        padding-top: 1rem !important;
+        padding-bottom: 1.75rem !important;
+    }
+
+    .card {
+        width: 100%;
+        padding: 1rem !important;
+        border-radius: 10px;
+    }
+
+    .card h2 {
+        font-size: 1.35rem !important;
+        line-height: 1.25;
+        overflow-wrap: anywhere;
+    }
+
+    .card p,
+    .card small,
+    .form-row label {
+        overflow-wrap: anywhere;
+    }
+
+    .form-row {
+        margin-bottom: 1rem;
+    }
+
+    .form-row input,
+    .form-row select,
+    .form-row textarea,
+    .card input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+    .card select,
+    .card textarea {
+        min-height: 44px;
+        font-size: 1rem;
+    }
+
+    .button-group {
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+
+    .button-group button,
+    .button-group .button-link {
+        width: 100%;
+        min-height: 44px;
+        margin-left: 0 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .table-wrap {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-wrap table {
+        min-width: 560px;
+        width: max-content;
+    }
+
+    .table-wrap th,
+    .table-wrap td {
+        padding: 0.7rem 0.6rem;
+        vertical-align: top;
+    }
+
+    .messages {
+        left: 0.85rem;
+        right: 0.85rem;
+        max-width: none;
+    }
+}
