@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db.models import Q
 from django.db import models
 
 from academia.models import Member
@@ -51,6 +52,12 @@ class PersonalTrainer(models.Model):
     last_name = models.CharField(
         max_length=100, blank=True, verbose_name='Sobrenome')
     email = models.EmailField(unique=True, verbose_name='E-mail')
+    cpf = models.CharField(max_length=11, blank=True, verbose_name='CPF')
+    subscription_exempt = models.BooleanField(
+        default=False,
+        verbose_name='Isento de assinatura',
+        help_text='Permite acesso sem cobrança mensal. Use apenas para contas criadas pelo administrador.',
+    )
     phone = models.CharField(max_length=20, blank=True,
                              verbose_name='Telefone')
     cref = models.CharField(max_length=30, blank=True, verbose_name='CREF')
@@ -61,6 +68,13 @@ class PersonalTrainer(models.Model):
         verbose_name = 'Personal'
         verbose_name_plural = 'Personais'
         ordering = ['first_name', 'last_name']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['cpf'],
+                condition=Q(cpf__gt=''),
+                name='unique_personal_trainer_cpf',
+            ),
+        ]
 
     def __str__(self):
         full_name = f'{self.first_name} {self.last_name}'.strip()

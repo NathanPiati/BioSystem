@@ -112,7 +112,7 @@ def home(request):
     personal_values = [p['num_clients'] for p in personals_data]
 
     context = {
-        'title': 'Academia BioSystem',
+        'title': 'Academia Evolutty',
         'description': 'Gestão de alunos, planos e matrículas para sua academia.',
         'member_count': member_count,
         'plan_count': plan_count,

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Exemplo de integração com catraca para Academia BioSystem
+Exemplo de integração com catraca para Academia Evolutty
 
 Este script demonstra como uma catraca física pode se integrar
 com o sistema Django para validar acessos de alunos.
@@ -25,7 +25,7 @@ TURNSTILE_ID = 'entrance_main'  # ID único da catraca
 
 
 class TurnstileController:
-    """Controlador de catraca para integração com Academia BioSystem"""
+    """Controlador de catraca para integração com Academia Evolutty"""
 
     def __init__(self, server_url, turnstile_id):
         self.server_url = server_url.rstrip('/')
@@ -126,7 +126,7 @@ class TurnstileController:
 def simulate_turnstile():
     """Simulação de funcionamento de uma catraca"""
 
-    print("🚪 Simulador de Catraca - Academia BioSystem")
+    print("🚪 Simulador de Catraca - Academia Evolutty")
     print("=" * 50)
 
     # Inicializar controlador

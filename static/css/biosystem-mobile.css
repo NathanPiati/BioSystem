@@ -1,4 +1,18 @@
-/* BioSystem — utilitários responsivos compartilhados */
+/* Evolutty — utilitários responsivos compartilhados */
+
+.site-footer-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.35rem 1rem;
+    text-align: center;
+}
+
+.site-footer-support {
+    color: inherit;
+    opacity: 0.9;
+}
 
 /* ── Navegação mobile ── */
 .header-brand-row {

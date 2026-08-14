@@ -11,8 +11,11 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import DeleteView, DetailView, ListView, UpdateView
 
 from academia.models import Member
+from billing.models import Subscription
 
-from .forms import PersonalTrainerProfileForm, PersonalTrainerRegisterForm, WorkoutExerciseFormSet, WorkoutForm
+from .forms import (AdminPersonalTrainerRegisterForm,
+                    PersonalTrainerProfileForm, PersonalTrainerRegisterForm,
+                    WorkoutExerciseFormSet, WorkoutForm)
 from .models import PersonalClient, PersonalTrainer, Workout, WorkoutExercise, Exercise
 from .services import EvolutionAPIError, send_workout_message
 
@@ -28,6 +31,17 @@ def _get_personal(user):
         return user.personaltrainer
     except PersonalTrainer.DoesNotExist:
         return None
+
+
+def _has_active_subscription(personal):
+    if personal is None:
+        return False
+    if personal.subscription_exempt:
+        return True
+    try:
+        return personal.subscription.has_access()
+    except Subscription.DoesNotExist:
+        return False
 
 
 def _redirect_without_personal(request):
@@ -55,6 +69,10 @@ class PersonalScopedMixin(LoginRequiredMixin):
             messages.error(
                 request, 'Sua conta não está vinculada a nenhum personal trainer.')
             return redirect('home')
+        if not (request.user.is_staff or request.user.is_superuser) and not _has_active_subscription(self.personal):
+            messages.info(
+                request, 'Ative sua assinatura para acessar o Portal Personal Trainer.')
+            return redirect('subscription_checkout')
         return super(LoginRequiredMixin, self).dispatch(request, *args, **kwargs)
 
 
@@ -81,11 +99,15 @@ class PortalLoginView(LoginView):
 
     def get_success_url(self):
         if _get_personal(self.request.user) is not None:
+            if not _has_active_subscription(_get_personal(self.request.user)):
+                return reverse('subscription_checkout')
             return reverse('portal_home')
         return super().get_success_url()
 
     def get_default_redirect_url(self):
         if _get_personal(self.request.user) is not None:
+            if not _has_active_subscription(_get_personal(self.request.user)):
+                return reverse('subscription_checkout')
             return reverse('portal_home')
         return reverse('home')
 
@@ -97,6 +119,11 @@ def portal_home(request):
     personal = _get_personal(request.user)
     if not (request.user.is_staff or request.user.is_superuser) and personal is None:
         return render(request, 'portal/dashboard.html', {'title': 'Portal PT', 'no_access': True})
+    if personal and not _has_active_subscription(personal):
+        return render(request, 'portal/dashboard.html', {
+            'title': 'Assinatura necessária',
+            'subscription_required': True,
+        })
 
     if personal:
         base_clients = PersonalClient.objects.filter(personal=personal)
@@ -127,7 +154,10 @@ def portal_home(request):
 def portal_register(request):
     # Usuário logado e já tem personal → vai direto para o portal
     if request.user.is_authenticated and _get_personal(request.user) is not None:
-        return redirect('portal_home')
+        personal = _get_personal(request.user)
+        if _has_active_subscription(personal):
+            return redirect('portal_home')
+        return redirect('subscription_checkout')
 
     # Usuário logado SEM personal → só preenche dados de personal (sem criar novo User)
     if request.user.is_authenticated:
@@ -137,7 +167,7 @@ def portal_register(request):
                 personal = form.save(request.user)
                 messages.success(
                     request, f'Perfil criado! Bem-vindo, {personal.first_name}.')
-                return redirect('portal_home')
+                return redirect('subscription_checkout')
         else:
             form = PersonalTrainerProfileForm()
         return render(request, 'portal/registro.html', {
@@ -146,15 +176,15 @@ def portal_register(request):
 
     # Usuário não autenticado → cria User + PersonalTrainer
     if request.method == 'POST':
-        form = PersonalTrainerRegisterForm(request.POST)
+        form = AdminPersonalTrainerRegisterForm(request.POST)
         if form.is_valid():
             personal = form.save()
             login(request, personal.user)
             messages.success(
                 request, f'Bem-vindo, {personal.first_name}! Conta criada com sucesso.')
-            return redirect('portal_home')
+            return redirect('subscription_checkout')
     else:
-        form = PersonalTrainerRegisterForm()
+        form = AdminPersonalTrainerRegisterForm()
     return render(request, 'portal/registro.html', {'form': form, 'title': 'Criar conta — Portal PT'})
 
 
@@ -184,7 +214,8 @@ def personal_create(request):
 
 class PersonalTrainerUpdateView(PersonalScopedMixin, UpdateView):
     model = PersonalTrainer
-    fields = ['first_name', 'last_name', 'email', 'phone', 'cref', 'is_active']
+    fields = ['first_name', 'last_name', 'email',
+              'cpf', 'phone', 'cref', 'is_active', 'subscription_exempt']
     template_name = 'personais/personal_form.html'
 
     def get_success_url(self):

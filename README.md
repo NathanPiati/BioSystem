@@ -1,6 +1,6 @@
-# Academia BioSystem
+# Academia Evolutty
 
-Projeto Django para gestão de academias com PostgreSQL, integração com catracas e **reconhecimento biométrico** (impressão digital e facial).
+Projeto Django para gestão de academias e personal trainers com PostgreSQL, integração com catracas e **reconhecimento biométrico** (impressão digital e facial).
 
 ## Funcionalidades
 

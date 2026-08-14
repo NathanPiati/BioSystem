@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
+import re
 
 from .models import PersonalClient, PersonalTrainer, Workout, WorkoutExercise
 
@@ -24,6 +25,7 @@ class PersonalTrainerRegisterForm(forms.Form):
     last_name = forms.CharField(
         max_length=100, required=False, label='Sobrenome')
     email = forms.EmailField(label='E-mail')
+    cpf = forms.CharField(max_length=14, label='CPF')
     phone = forms.CharField(max_length=20, required=False, label='Telefone')
     cref = forms.CharField(max_length=30, required=False, label='CREF')
     username = forms.CharField(max_length=150, label='Nome de usuário')
@@ -42,6 +44,22 @@ class PersonalTrainerRegisterForm(forms.Form):
         if PersonalTrainer.objects.filter(email=email).exists():
             raise forms.ValidationError('Este e-mail já está cadastrado.')
         return email
+
+    def clean_cpf(self):
+        cpf = re.sub(r'\D', '', self.cleaned_data['cpf'])
+        if len(cpf) != 11 or cpf == cpf[0] * 11:
+            raise forms.ValidationError('Digite um CPF válido.')
+        total = sum(int(digit) * (10 - index)
+                    for index, digit in enumerate(cpf[:9]))
+        first_digit = (total * 10 % 11) % 10
+        total = sum(int(digit) * (11 - index)
+                    for index, digit in enumerate(cpf[:10]))
+        second_digit = (total * 10 % 11) % 10
+        if cpf[-2:] != f'{first_digit}{second_digit}':
+            raise forms.ValidationError('Digite um CPF válido.')
+        if PersonalTrainer.objects.filter(cpf=cpf).exists():
+            raise forms.ValidationError('Este CPF já está cadastrado.')
+        return cpf
 
     def clean(self):
         cleaned_data = super().clean()
@@ -73,10 +91,20 @@ class PersonalTrainerRegisterForm(forms.Form):
             first_name=d['first_name'],
             last_name=d.get('last_name', ''),
             email=d['email'],
+            cpf=d['cpf'],
+            subscription_exempt=d.get('subscription_exempt', False),
             phone=d.get('phone', ''),
             cref=d.get('cref', ''),
         )
         return personal
+
+
+class AdminPersonalTrainerRegisterForm(PersonalTrainerRegisterForm):
+    subscription_exempt = forms.BooleanField(
+        required=False,
+        label='Isento de assinatura',
+        help_text='Libera o acesso sem cobrança mensal.',
+    )
 
 
 class PersonalTrainerProfileForm(forms.Form):
@@ -85,6 +113,7 @@ class PersonalTrainerProfileForm(forms.Form):
     last_name = forms.CharField(
         max_length=100, required=False, label='Sobrenome')
     email = forms.EmailField(label='E-mail')
+    cpf = forms.CharField(max_length=14, label='CPF')
     phone = forms.CharField(max_length=20, required=False, label='Telefone')
     cref = forms.CharField(max_length=30, required=False, label='CREF')
 
@@ -94,6 +123,22 @@ class PersonalTrainerProfileForm(forms.Form):
             raise forms.ValidationError('Este e-mail já está cadastrado.')
         return email
 
+    def clean_cpf(self):
+        cpf = re.sub(r'\D', '', self.cleaned_data['cpf'])
+        if len(cpf) != 11 or cpf == cpf[0] * 11:
+            raise forms.ValidationError('Digite um CPF válido.')
+        total = sum(int(digit) * (10 - index)
+                    for index, digit in enumerate(cpf[:9]))
+        first_digit = (total * 10 % 11) % 10
+        total = sum(int(digit) * (11 - index)
+                    for index, digit in enumerate(cpf[:10]))
+        second_digit = (total * 10 % 11) % 10
+        if cpf[-2:] != f'{first_digit}{second_digit}':
+            raise forms.ValidationError('Digite um CPF válido.')
+        if PersonalTrainer.objects.filter(cpf=cpf).exists():
+            raise forms.ValidationError('Este CPF já está cadastrado.')
+        return cpf
+
     def save(self, user):
         d = self.cleaned_data
         personal = PersonalTrainer.objects.create(
@@ -101,6 +146,7 @@ class PersonalTrainerProfileForm(forms.Form):
             first_name=d['first_name'],
             last_name=d.get('last_name', ''),
             email=d['email'],
+            cpf=d['cpf'],
             phone=d.get('phone', ''),
             cref=d.get('cref', ''),
         )

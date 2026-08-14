@@ -36,7 +36,14 @@
     .alert-warn { background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 10px; padding: 0.9rem 1.25rem; color: #92400e; font-size: 0.88rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.6rem; }
 </style>
 
-{% if no_access %}
+{% if subscription_required %}
+    <div style="text-align:center; padding:4rem 0;">
+        <div style="font-size:4rem; margin-bottom:1rem;">🔒</div>
+        <h2 style="color:#064e3b; margin-bottom:0.5rem;">Assinatura necessária</h2>
+        <p style="color:#6b7280; margin-bottom:2rem;">Faça o pagamento da assinatura mensal para liberar o acesso ao sistema.</p>
+        <a href="{% url 'subscription_checkout' %}" class="button-link">Ver assinatura e pagar</a>
+    </div>
+{% elif no_access %}
     <div style="text-align:center; padding:4rem 0;">
         <div style="font-size:4rem; margin-bottom:1rem;">🔒</div>
         <h2 style="color:#064e3b; margin-bottom:0.5rem;">Acesso restrito</h2>

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Sistema Biométrico para Academia BioSystem
+Sistema Biométrico para Academia Evolutty
 
 Este script demonstra como implementar reconhecimento facial
 e de impressão digital no sistema de controle de acesso.
@@ -30,7 +30,7 @@ SERVER_URL = 'http://127.0.0.1:8000'  # Altere para o URL do seu servidor
 
 
 class BiometricSystem:
-    """Sistema biométrico para integração com Academia BioSystem"""
+    """Sistema biométrico para integração com Academia Evolutty"""
 
     def __init__(self, server_url):
         self.server_url = server_url.rstrip('/')
@@ -180,7 +180,7 @@ class BiometricSystem:
 def simulate_biometric_enrollment():
     """Simula o cadastro biométrico de alunos"""
 
-    print("🔐 Cadastro Biométrico - Academia BioSystem")
+    print("🔐 Cadastro Biométrico - Academia Evolutty")
     print("=" * 50)
 
     bio_system = BiometricSystem(SERVER_URL)
@@ -266,7 +266,7 @@ def create_sample_image():
 def main():
     """Função principal"""
 
-    print("Sistema Biométrico - Academia BioSystem")
+    print("Sistema Biométrico - Academia Evolutty")
     print("Escolha uma opção:")
     print("1. Criar imagem de exemplo")
     print("2. Simular cadastro biométrico")

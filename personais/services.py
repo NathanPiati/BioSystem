@@ -40,7 +40,7 @@ def build_workout_message(workout):
 
     if workout.notes:
         lines.extend(['', f'*Observações:* {workout.notes}'])
-    lines.extend(['', 'BioSystem - Portal Personal Trainer'])
+    lines.extend(['', 'Evolutty - Portal Personal Trainer'])
     return '\n'.join(lines)
 
 

@@ -90,7 +90,17 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'academia',
     'personais',
+    'billing',
 ]
+
+ASAAS_WEBHOOK_TOKEN = os.environ.get('ASAAS_WEBHOOK_TOKEN', '')
+ASAAS_API_KEY = os.environ.get('ASAAS_API_KEY', '')
+ASAAS_API_URL = os.environ.get(
+    'ASAAS_API_URL', 'https://api-sandbox.asaas.com/v3')
+ASAAS_MONTHLY_VALUE = os.environ.get('ASAAS_MONTHLY_VALUE', '0')
+ASAAS_BILLING_TYPE = os.environ.get('ASAAS_BILLING_TYPE', 'PIX')
+ASAAS_SUBSCRIPTION_DESCRIPTION = os.environ.get(
+    'ASAAS_SUBSCRIPTION_DESCRIPTION', 'Assinatura mensal Evolutty')
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -114,6 +124,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'biosystem.context_processors.app_metadata',
             ],
         },
     },
@@ -179,6 +190,12 @@ STATICFILES_DIRS = [
 
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
+
+APP_VERSION = os.environ.get('APP_VERSION', '1.0.0').strip()
+SUPPORT_CONTACT = os.environ.get(
+    'SUPPORT_CONTACT',
+    'Para dúvidas ou abertura de chamados, entre em contato com o administrador do sistema.',
+).strip()
 
 EVOLUTION_API_URL = os.environ.get('EVOLUTION_API_URL', '').strip()
 EVOLUTION_API_KEY = os.environ.get('EVOLUTION_API_KEY', '').strip()

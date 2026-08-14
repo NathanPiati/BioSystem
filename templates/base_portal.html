@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title|default:'Portal Personal' }} — BioSystem PT</title>
+    <title>{{ title|default:'Portal Personal' }} — Evolutty</title>
     {% load static %}
+    <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}">
     <link rel="stylesheet" href="{% static 'css/biosystem-mobile.css' %}">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -302,7 +303,7 @@
                 <div class="header-brand-row">
                     <a href="{% url 'portal_home' %}" class="brand">
                         <div class="brand-logo">💪</div>
-                        <h1>BioSystem</h1>
+                        <h1>Evolutty</h1>
                         <span class="brand-tag">Portal PT</span>
                     </a>
                     <button type="button" class="nav-toggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="portal-navigation">
@@ -362,7 +363,10 @@
     </main>
 
     <footer>
-        <div class="container">BioSystem — Portal de Gestão para Personal Trainers</div>
+        <div class="container site-footer-content">
+            <span>Evolutty v{{ app_version }}</span>
+            <span class="site-footer-support">{{ support_contact }}</span>
+        </div>
     </footer>
     <script>
         document.querySelectorAll('.nav-toggle').forEach(toggle => {

@@ -1,0 +1,30 @@
+{% extends 'base_portal.html' %}
+
+{% block content %}
+<div style="max-width: 560px; margin: 0 auto;">
+    <div class="portal-hero">
+        <h2>Assinatura Evolutty</h2>
+        <p>Tenha acesso ao Portal Personal Trainer com cobrança mensal.</p>
+    </div>
+
+    <div class="card">
+        {% if subscription and subscription.status == 'ACTIVE' %}
+            <h3>Assinatura ativa</h3>
+            <p style="margin-top: 0.75rem;">Seu acesso está liberado.</p>
+            <div class="button-group">
+                <a class="button-link" href="{% url 'portal_home' %}">Ir para o portal</a>
+            </div>
+        {% else %}
+            <h3>Plano mensal</h3>
+            <p style="margin-top: 0.75rem;">Valor: <strong>R$ {{ monthly_value }}</strong> por mês.</p>
+            <p style="margin-top: 0.5rem; color: #6b7280;">O pagamento será processado com segurança pelo Asaas.</p>
+            <form method="post">
+                {% csrf_token %}
+                <div class="button-group">
+                    <button type="submit">Contratar e pagar agora</button>
+                </div>
+            </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

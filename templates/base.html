@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }}</title>
     {% load static %}
+    <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}">
     <link rel="stylesheet" href="{% static 'css/biosystem-mobile.css' %}">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -106,7 +107,7 @@
                 <div class="header-brand-row">
                     <a href="{% url 'home' %}" class="brand">
                         <span>🏋️</span>
-                        <h1>BioSystem</h1>
+                        <h1>Evolutty</h1>
                     </a>
                     <button type="button" class="nav-toggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="main-navigation">
                         <span></span><span></span><span></span>
@@ -170,8 +171,9 @@
         </div>
     </main>
     <footer>
-        <div class="container">
-            Sistema web para academias criado com Django e PostgreSQL.
+        <div class="container site-footer-content">
+            <span>Evolutty v{{ app_version }}</span>
+            <span class="site-footer-support">{{ support_contact }}</span>
         </div>
     </footer>
     <script>
