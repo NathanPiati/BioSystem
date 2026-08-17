@@ -1,0 +1,26 @@
+{% extends 'base_portal.html' %}
+
+{% block content %}
+    <span class="eyebrow">Acesso restrito ao administrador</span>
+    <h2>{% if object %}Editar configuração{% else %}Nova configuração{% endif %}</h2>
+    <p>Associe uma instância da Evolution API ao personal selecionado.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-row">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+                {% for error in field.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+            </div>
+        {% endfor %}
+        {% if form.non_field_errors %}
+            {% for error in form.non_field_errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+        {% endif %}
+        <div class="button-group">
+            <button type="submit">Salvar configuração</button>
+            <a class="button-link btn-secondary" href="{% url 'whatsapp_config_list' %}">Cancelar</a>
+        </div>
+    </form>
+{% endblock %}

@@ -3,6 +3,8 @@ import re
 import requests
 from django.conf import settings
 
+from .models import PersonalWhatsAppConfig
+
 
 class EvolutionAPIError(Exception):
     """Erro esperado ao enviar uma mensagem pela Evolution API."""
@@ -20,37 +22,57 @@ def _whatsapp_number(phone):
 
 def build_workout_message(workout):
     lines = [
-        f'*Ficha de treino: {workout.name}*',
-        f'Cliente: {workout.client}',
-        f'Personal: {workout.personal}',
+        '🏋️ *EVOLUTTY | FICHA DE TREINO*',
+        '━━━━━━━━━━━━━━━━━━━━',
+        f'*Treino:* {workout.name}',
+        f'*Aluno:* {workout.client}',
+        f'*Personal:* {workout.personal}',
     ]
     if workout.goal:
-        lines.append(f'Objetivo: {workout.goal}')
+        lines.append(f'*Objetivo:* {workout.goal}')
 
-    lines.append('')
-    lines.append('*Exercícios*')
+    lines.extend(['', '*📋 EXERCÍCIOS*', ''])
     exercises = workout.exercises.all()
     for exercise in exercises:
-        load = exercise.load or 'sem carga'
-        lines.append(
-            f'{exercise.order}. {exercise.name} | '
-            f'{exercise.sets} séries x {exercise.reps} | '
-            f'Carga: {load} | Descanso: {exercise.rest_seconds}s'
-        )
+        lines.extend([
+            f'*{exercise.order:02d} · {exercise.name}*',
+            f'   • {exercise.sets} séries × {exercise.reps} repetições',
+            f'   • Carga: {exercise.load or "Peso livre"}',
+            f'   • Descanso: {exercise.rest_seconds}s',
+            '',
+        ])
 
     if workout.notes:
-        lines.extend(['', f'*Observações:* {workout.notes}'])
-    lines.extend(['', 'Evolutty - Portal Personal Trainer'])
+        lines.extend(['*📝 OBSERVAÇÕES*', workout.notes, ''])
+    lines.extend([
+        '━━━━━━━━━━━━━━━━━━━━',
+        '💪 Bons treinos e evolução constante!',
+        '_Enviado pelo Evolutty_',
+    ])
     return '\n'.join(lines)
 
 
 def send_workout_message(workout):
-    api_url = getattr(settings, 'EVOLUTION_API_URL', '').rstrip('/')
-    api_key = getattr(settings, 'EVOLUTION_API_KEY', '')
-    instance = getattr(settings, 'EVOLUTION_API_INSTANCE', '')
+    config = getattr(workout.personal, 'whatsapp_config', None)
+    if config is None and hasattr(workout.personal, 'pk'):
+        config = PersonalWhatsAppConfig.objects.filter(
+            personal_id=workout.personal.pk).first()
+
+    if config is not None:
+        if not config.enabled or not config.send_workout_messages:
+            raise EvolutionAPIError(
+                'O envio de fichas está desativado para este personal.')
+        api_url = config.api_url.rstrip('/')
+        api_key = config.api_key
+        instance = config.instance_name
+    else:
+        api_url = getattr(settings, 'EVOLUTION_API_URL', '').rstrip('/')
+        api_key = getattr(settings, 'EVOLUTION_API_KEY', '')
+        instance = getattr(settings, 'EVOLUTION_API_INSTANCE', '')
     if not api_url or not api_key or not instance:
         raise EvolutionAPIError(
             'A Evolution API não está configurada. Defina '
+            'a configuração do WhatsApp do personal ou as variáveis '
             'EVOLUTION_API_URL, EVOLUTION_API_KEY e EVOLUTION_API_INSTANCE.'
         )
 

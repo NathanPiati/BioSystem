@@ -8,15 +8,17 @@ from django.forms import modelform_factory
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
-from django.views.generic import DeleteView, DetailView, ListView, UpdateView
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from academia.models import Member
 from billing.models import Subscription
 
 from .forms import (AdminPersonalTrainerRegisterForm,
                     PersonalTrainerProfileForm, PersonalTrainerRegisterForm,
+                    PersonalWhatsAppConfigForm,
                     WorkoutExerciseFormSet, WorkoutForm)
-from .models import PersonalClient, PersonalTrainer, Workout, WorkoutExercise, Exercise
+from .models import (Exercise, PersonalClient, PersonalTrainer,
+                     PersonalWhatsAppConfig, Workout, WorkoutExercise)
 from .services import EvolutionAPIError, send_workout_message
 
 
@@ -110,6 +112,42 @@ class PortalLoginView(LoginView):
                 return reverse('subscription_checkout')
             return reverse('portal_home')
         return reverse('home')
+
+
+class SuperuserRequiredMixin(StaffRequiredMixin):
+    def test_func(self):
+        return self.request.user.is_superuser
+
+
+class WhatsAppConfigListView(SuperuserRequiredMixin, ListView):
+    model = PersonalWhatsAppConfig
+    template_name = 'personais/whatsapp_config_list.html'
+    context_object_name = 'configs'
+
+    def get_queryset(self):
+        return self.model.objects.select_related('personal')
+
+
+class WhatsAppConfigCreateView(SuperuserRequiredMixin, CreateView):
+    model = PersonalWhatsAppConfig
+    form_class = PersonalWhatsAppConfigForm
+    template_name = 'personais/whatsapp_config_form.html'
+    success_url = reverse_lazy('whatsapp_config_list')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Configuração de WhatsApp salva.')
+        return super().form_valid(form)
+
+
+class WhatsAppConfigUpdateView(SuperuserRequiredMixin, UpdateView):
+    model = PersonalWhatsAppConfig
+    form_class = PersonalWhatsAppConfigForm
+    template_name = 'personais/whatsapp_config_form.html'
+    success_url = reverse_lazy('whatsapp_config_list')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Configuração de WhatsApp atualizada.')
+        return super().form_valid(form)
 
 
 # ── Portal home ────────────────────────────────────────────────────────────────

@@ -1,0 +1,47 @@
+{% extends 'base_portal.html' %}
+
+{% block content %}
+    <div class="detail-header">
+        <div>
+            <span class="eyebrow">Acesso restrito ao administrador</span>
+            <h2>WhatsApp por personal</h2>
+            <p>Gerencie a instância da Evolution API usada em cada envio.</p>
+        </div>
+    </div>
+
+    <div class="button-group">
+        <a class="button-link" href="{% url 'whatsapp_config_create' %}">Nova configuração</a>
+    </div>
+
+    <p class="table-scroll-hint">Deslize a tabela para o lado para ver todas as colunas.</p>
+    <div class="table-wrap wide-list-table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Personal</th>
+                    <th>Instância</th>
+                    <th>Envio</th>
+                    <th>Atualizado em</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for config in configs %}
+                    <tr>
+                        <td>{{ config.personal }}</td>
+                        <td>{{ config.instance_name }}</td>
+                        <td>{% if config.enabled and config.send_workout_messages %}Ativo{% else %}Desativado{% endif %}</td>
+                        <td>{{ config.updated_at|date:'d/m/Y H:i' }}</td>
+                        <td class="table-actions">
+                            <a href="{% url 'whatsapp_config_edit' config.pk %}">Editar</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5">Nenhuma configuração cadastrada. O envio continuará usando a configuração global enquanto isso.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

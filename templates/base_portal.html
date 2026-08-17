@@ -315,6 +315,7 @@
                     {% if request.user.is_authenticated %}
                         {% if request.user.is_superuser %}
                             <a href="{% url 'personal_list' %}" class="nav-link {% if 'personal_list' in request.resolver_match.url_name %}active{% endif %}">🧑‍🏫 Personais</a>
+                            <a href="{% url 'whatsapp_config_list' %}" class="nav-link {% if 'whatsapp_config' in request.resolver_match.url_name %}active{% endif %}">💬 WhatsApp</a>
                         {% endif %}
                         <a href="{% url 'personal_client_list' %}" class="nav-link {% if 'personal_client' in request.resolver_match.url_name %}active{% endif %}">👥 Clientes</a>
                         <a href="{% url 'workout_list' %}" class="nav-link {% if 'workout' in request.resolver_match.url_name %}active{% endif %}">📋 Treinos</a>

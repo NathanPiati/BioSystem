@@ -32,9 +32,11 @@ class EvolutionServiceTests(SimpleTestCase):
     def test_builds_workout_message(self):
         message = build_workout_message(self._workout())
 
-        self.assertIn('*Ficha de treino: Treino A*', message)
-        self.assertIn('1. Agachamento | 4 séries x 12', message)
-        self.assertIn('*Observações:* Manter postura.', message)
+        self.assertIn('🏋️ *EVOLUTTY | FICHA DE TREINO*', message)
+        self.assertIn('*01 · Agachamento*', message)
+        self.assertIn('4 séries × 12 repetições', message)
+        self.assertIn('*📝 OBSERVAÇÕES*', message)
+        self.assertIn('Manter postura.', message)
 
     @override_settings(
         EVOLUTION_API_URL='https://evolution.example.com/',

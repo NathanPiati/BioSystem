@@ -81,6 +81,34 @@ class PersonalTrainer(models.Model):
         return full_name or self.email
 
 
+class PersonalWhatsAppConfig(models.Model):
+    personal = models.OneToOneField(
+        PersonalTrainer,
+        on_delete=models.CASCADE,
+        related_name='whatsapp_config',
+        verbose_name='Personal',
+    )
+    api_url = models.URLField(verbose_name='URL da Evolution API')
+    api_key = models.CharField(max_length=255, verbose_name='Chave da API')
+    instance_name = models.CharField(
+        max_length=120, verbose_name='Nome da instância')
+    enabled = models.BooleanField(
+        default=True, verbose_name='Integração ativa')
+    send_workout_messages = models.BooleanField(
+        default=True,
+        verbose_name='Permitir envio de fichas',
+    )
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Configuração de WhatsApp'
+        verbose_name_plural = 'Configurações de WhatsApp'
+        ordering = ['personal__first_name', 'personal__last_name']
+
+    def __str__(self):
+        return f'{self.personal} - {self.instance_name}'
+
+
 class PersonalClient(models.Model):
     personal = models.ForeignKey(
         PersonalTrainer,

@@ -4,7 +4,8 @@ from django.contrib.auth.password_validation import validate_password
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
 import re
 
-from .models import PersonalClient, PersonalTrainer, Workout, WorkoutExercise
+from .models import (PersonalClient, PersonalTrainer, PersonalWhatsAppConfig,
+                     Workout, WorkoutExercise)
 
 
 class WorkoutForm(forms.ModelForm):
@@ -151,6 +152,19 @@ class PersonalTrainerProfileForm(forms.Form):
             cref=d.get('cref', ''),
         )
         return personal
+
+
+class PersonalWhatsAppConfigForm(forms.ModelForm):
+    class Meta:
+        model = PersonalWhatsAppConfig
+        fields = ['personal', 'api_url', 'api_key', 'instance_name',
+                  'enabled', 'send_workout_messages']
+        widgets = {'api_key': forms.PasswordInput(render_value=True)}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['personal'].queryset = PersonalTrainer.objects.order_by(
+            'first_name', 'last_name')
 
 
 class WorkoutExerciseFormSetBase(BaseInlineFormSet):

@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import PersonalClient, PersonalTrainer, Workout, WorkoutExercise
+from .models import (PersonalClient, PersonalTrainer, PersonalWhatsAppConfig,
+                     Workout, WorkoutExercise)
 
 
 class WorkoutExerciseInline(admin.TabularInline):
@@ -15,9 +16,19 @@ class PersonalTrainerAdmin(admin.ModelAdmin):
     list_filter = ('is_active',)
 
 
+@admin.register(PersonalWhatsAppConfig)
+class PersonalWhatsAppConfigAdmin(admin.ModelAdmin):
+    list_display = ('personal', 'instance_name', 'enabled',
+                    'send_workout_messages', 'updated_at')
+    list_filter = ('enabled', 'send_workout_messages')
+    search_fields = ('personal__first_name', 'personal__last_name',
+                     'personal__email', 'instance_name')
+
+
 @admin.register(PersonalClient)
 class PersonalClientAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'last_name', 'personal', 'phone', 'academy_member')
+    list_display = ('first_name', 'last_name',
+                    'personal', 'phone', 'academy_member')
     search_fields = ('first_name', 'last_name', 'email')
     list_filter = ('personal',)
 
