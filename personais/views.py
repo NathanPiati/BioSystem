@@ -187,7 +187,7 @@ def portal_home(request):
         'total_personals':  base_pt.count(),
         'total_clients':    base_clients.count(),
         'total_workouts':   base_workouts.count(),
-        'total_exercises':  WorkoutExercise.objects.filter(workout__in=base_workouts).count(),
+        'total_exercises':  Exercise.objects.filter(is_active=True).count(),
         'clients_without_workout': base_clients.filter(workouts__isnull=True).count(),
         'recent_personals': base_pt.prefetch_related('clients')[:5],
         'recent_workouts':  base_workouts.select_related('client', 'personal').order_by('-updated_at')[:6],
