@@ -5,7 +5,7 @@
     <div class="button-group">
         <a class="button-link" href="{% url 'enrollment_create' %}">Nova matrícula</a>
     </div>
-    <div class="table-wrap">
+    <div class="table-wrap desktop-only">
     <table>
         <thead>
             <tr>
@@ -34,5 +34,33 @@
             {% endfor %}
         </tbody>
     </table>
+    </div>
+
+    <!-- Visão em cartões, exibida somente em telas de celular -->
+    <div class="mobile-cards">
+        {% for enrollment in enrollments %}
+            <div class="app-card">
+                <div class="app-card-top">
+                    <span class="app-card-icon">✅</span>
+                    <div class="app-card-heading">
+                        <strong>{{ enrollment.member }}</strong>
+                        <span class="badge badge-info">{{ enrollment.plan }}</span>
+                    </div>
+                </div>
+                <div class="app-card-info">
+                    <div class="app-card-row">
+                        <span>Início</span>
+                        <strong>{{ enrollment.start_date }}</strong>
+                    </div>
+                    <div class="app-card-row">
+                        <span>Fim</span>
+                        <strong>{{ enrollment.end_date|default:"—" }}</strong>
+                    </div>
+                </div>
+                <a class="app-card-action" href="{% url 'enrollment_edit' enrollment.pk %}">Editar ›</a>
+            </div>
+        {% empty %}
+            <p class="empty-state">Nenhuma matrícula registrada ainda.</p>
+        {% endfor %}
     </div>
 {% endblock %}

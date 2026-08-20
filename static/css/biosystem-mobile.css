@@ -546,3 +546,107 @@ main .card {
         max-width: none;
     }
 }
+
+/* ── Cartões estilo app (listas em telas de celular) ── */
+.mobile-cards {
+    display: none;
+}
+
+.empty-state {
+    text-align: center;
+    color: #718096;
+    padding: 2rem 1rem;
+}
+
+@media (max-width: 768px) {
+    .desktop-only {
+        display: none !important;
+    }
+
+    .mobile-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .app-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 1rem 1.1rem;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+        animation: menuItemIn 0.3s ease both;
+    }
+
+    .app-card:active {
+        transform: scale(0.98);
+        transition: transform 0.1s ease;
+    }
+
+    .app-card-top {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .app-card-icon {
+        font-size: 1.4rem;
+        flex-shrink: 0;
+    }
+
+    .app-card-heading {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+        min-width: 0;
+    }
+
+    .app-card-heading strong {
+        font-size: 1rem;
+        color: #1a202c;
+        overflow-wrap: anywhere;
+    }
+
+    .app-card-heading .badge {
+        align-self: flex-start;
+    }
+
+    .app-card-info {
+        border-top: 1px solid #edf2f7;
+        padding-top: 0.6rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+
+    .app-card-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.75rem;
+        font-size: 0.85rem;
+    }
+
+    .app-card-row span {
+        color: #718096;
+    }
+
+    .app-card-row strong {
+        color: #2d3748;
+        text-align: right;
+    }
+
+    .app-card-action {
+        display: block;
+        margin-top: 0.85rem;
+        text-align: center;
+        padding: 0.6rem;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+        color: #667eea;
+        font-weight: 700;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+}
