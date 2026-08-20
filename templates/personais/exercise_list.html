@@ -42,6 +42,7 @@
 <table>
     <thead>
         <tr>
+            <th>ID</th>
             <th>Exercício</th>
             <th>Grupo muscular</th>
             <th>Descrição</th>
@@ -52,6 +53,7 @@
     <tbody>
         {% for exercise in exercises %}
             <tr>
+                <td>{{ exercise.pk }}</td>
                 <td><strong>{{ exercise.name }}</strong></td>
                 <td>{{ exercise.get_muscle_group_display|default:'—' }}</td>
                 <td style="color:#6b7280; font-size:0.88rem; max-width:280px;">{{ exercise.description|truncatechars:60|default:'—' }}</td>

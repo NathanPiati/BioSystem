@@ -35,6 +35,15 @@ def _get_personal(user):
         return None
 
 
+def _exercise_library():
+    """Lista de exercícios ativos serializável em JSON para o autocomplete do formulário de treino."""
+    return [
+        {'name': ex.name, 'label': ex.get_muscle_group_display()
+         if ex.muscle_group else ''}
+        for ex in Exercise.objects.filter(is_active=True).order_by('name')
+    ]
+
+
 def _has_active_subscription(personal):
     if personal is None:
         return False
@@ -516,7 +525,9 @@ def workout_create(request):
         form = WorkoutForm(personal=personal)
         formset = WorkoutExerciseFormSet()
     return render(request, 'personais/workout_form.html', {
-        'form': form, 'formset': formset, 'title': 'Novo treino',        'exercises': Exercise.objects.filter(is_active=True).order_by('name'), })
+        'form': form, 'formset': formset, 'title': 'Novo treino',
+        'exercise_library': _exercise_library(),
+    })
 
 
 @login_required(login_url='login')
@@ -541,7 +552,9 @@ def workout_edit(request, pk):
         form = WorkoutForm(instance=workout, personal=personal)
         formset = WorkoutExerciseFormSet(instance=workout)
     return render(request, 'personais/workout_form.html', {
-        'form': form, 'formset': formset, 'title': 'Editar treino',        'exercises': Exercise.objects.filter(is_active=True).order_by('name'), })
+        'form': form, 'formset': formset, 'title': 'Editar treino',
+        'exercise_library': _exercise_library(),
+    })
 
 
 class WorkoutDetailView(PersonalScopedMixin, DetailView):

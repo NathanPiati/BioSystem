@@ -27,6 +27,31 @@
     .btn-add-row:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(16,185,129,0.45); }
     .delete-cell { text-align: center; }
 
+    /* Sugestões de exercício (substitui o datalist, que não funciona no Safari/iOS) */
+    .exercise-suggestions {
+        position: fixed;
+        z-index: 5000;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        max-height: 240px;
+        overflow-y: auto;
+        display: none;
+    }
+    .exercise-suggestions.is-open { display: block; }
+    .exercise-suggestion-item {
+        padding: 0.6rem 0.75rem;
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: #1a202c;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .exercise-suggestion-item:last-child { border-bottom: none; }
+    .exercise-suggestion-item small { display: block; color: #718096; font-size: 0.75rem; }
+    .exercise-suggestion-item:hover,
+    .exercise-suggestion-item.is-active { background: #f0fdf4; }
+
     @media (max-width: 768px) {
         .exercise-table-wrap { margin-left: -0.25rem; margin-right: -0.25rem; }
         .exercise-table { min-width: 780px; }
@@ -34,15 +59,12 @@
         .exercise-table input[type="number"],
         .exercise-table input[type="text"] { min-height: 44px; font-size: 1rem; }
         .btn-add-row { width: 100%; min-height: 44px; }
+        .exercise-suggestion-item { padding: 0.85rem 0.9rem; font-size: 1rem; }
     }
 </style>
 
-{# Biblioteca de exercícios para autocomplete #}
-<datalist id="exercise-library">
-    {% for ex in exercises %}
-        <option value="{{ ex.name }}"{% if ex.muscle_group %} label="{{ ex.get_muscle_group_display }}"{% endif %}>
-    {% endfor %}
-</datalist>
+{# Biblioteca de exercícios para autocomplete, lida via JS #}
+{{ exercise_library|json_script:"exercise-library-data" }}
 
 <h2>{{ title }}</h2>
 
@@ -113,6 +135,9 @@
     const tbody = document.getElementById('exercise-tbody');
     const exerciseRows = () => tbody.querySelectorAll('tr[data-exercise-row]');
 
+    const libraryEl = document.getElementById('exercise-library-data');
+    const library = libraryEl ? JSON.parse(libraryEl.textContent) : [];
+
     function renumberRows() {
         let order = 1;
         exerciseRows().forEach(function (row) {
@@ -125,14 +150,79 @@
         });
     }
 
-    function wireDatalist(row) {
-        const nameInput = row.querySelector('input[name$="-name"]');
-        if (nameInput) nameInput.setAttribute('list', 'exercise-library');
+    // Dropdown de sugestões customizado (o <datalist> nativo não abre no Safari/iOS)
+    const suggestionBox = document.createElement('div');
+    suggestionBox.className = 'exercise-suggestions';
+    document.body.appendChild(suggestionBox);
+    let activeInput = null;
+
+    function closeSuggestions() {
+        suggestionBox.classList.remove('is-open');
+        suggestionBox.innerHTML = '';
+        activeInput = null;
     }
 
-    // Adiciona datalist nas linhas já existentes
+    function positionSuggestions(input) {
+        const rect = input.getBoundingClientRect();
+        suggestionBox.style.left = rect.left + 'px';
+        suggestionBox.style.top = rect.bottom + 4 + 'px';
+        suggestionBox.style.width = Math.max(rect.width, 220) + 'px';
+    }
+
+    function openSuggestions(input) {
+        const query = input.value.trim().toLowerCase();
+        const matches = library
+            .filter(function (item) { return !query || item.name.toLowerCase().includes(query); })
+            .slice(0, 8);
+
+        if (!matches.length) { closeSuggestions(); return; }
+
+        suggestionBox.innerHTML = '';
+        matches.forEach(function (item) {
+            const option = document.createElement('div');
+            option.className = 'exercise-suggestion-item';
+            option.textContent = item.name;
+            if (item.label) {
+                const small = document.createElement('small');
+                small.textContent = item.label;
+                option.appendChild(small);
+            }
+            option.addEventListener('mousedown', function (event) {
+                event.preventDefault();
+                input.value = item.name;
+                closeSuggestions();
+            });
+            suggestionBox.appendChild(option);
+        });
+
+        activeInput = input;
+        positionSuggestions(input);
+        suggestionBox.classList.add('is-open');
+    }
+
+    function wireDatalist(row) {
+        const nameInput = row.querySelector('input[name$="-name"]');
+        if (!nameInput) return;
+        nameInput.addEventListener('focus', function () { openSuggestions(nameInput); });
+        nameInput.addEventListener('input', function () { openSuggestions(nameInput); });
+    }
+
+    document.addEventListener('scroll', function () {
+        if (activeInput) positionSuggestions(activeInput);
+    }, true);
+    window.addEventListener('resize', function () {
+        if (activeInput) positionSuggestions(activeInput);
+    });
+    document.addEventListener('click', function (event) {
+        if (activeInput && event.target !== activeInput && !suggestionBox.contains(event.target)) {
+            closeSuggestions();
+        }
+    });
+
+    // Adiciona o autocomplete nas linhas já existentes
     exerciseRows().forEach(wireDatalist);
     renumberRows();
+
 
     const templateRow = tbody.querySelector('tr[data-exercise-row]:not([data-existing])') || exerciseRows()[0];
 
